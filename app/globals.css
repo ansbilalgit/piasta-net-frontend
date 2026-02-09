@@ -19,9 +19,9 @@
   }
 }
 
+
 .header {
   background-color: #0b111f; /* header - bgcolor */
-  color: #397796; /* header - text color */
   padding: 0.75rem 1rem;
   margin-top: 0px;
   border-top: 1px solid #21262d; /* header - border top size & color */
@@ -44,6 +44,7 @@
 }
 
 .header-left {
+  background-clip: text;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -52,11 +53,33 @@
 }
 
 .header-right {
-  color: #f1f5f9; /* header - color element far right */
+  color: #88337c; /* header - color element far right */
   margin-left: auto;        /* Pushes the elements far right */
   display: flex;
   align-items: center;
   white-space: nowrap;
+}
+
+.login-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #9fb6c8;
+  background-color: transparent;
+  border: 1px solid #3a4a5a;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.login-btn:hover {
+  color: #e0e7ff;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #5a7a8a;
 }
 
 .nav-link {
@@ -77,13 +100,20 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.125rem;
+  font-size: 3rem;
   font-weight: 600;
-  font-style: bold;
+  font-style: bold;   
 }
 
 .header-icon {
   font-size: 2rem;
+}
+
+.header-logo-text {
+  background: linear-gradient(90deg, #00b4ff, #9b4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .header-credit {
@@ -131,4 +161,144 @@ body {
   font-size: 0.875rem;
   color: #69869d; /* footer - text right color */
   text-align: right;
+}
+
+/* ...existing code... */
+html, body {
+  height: 100%;
+}
+
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* HERO (tab 1) */
+.hero {
+  text-align: center;
+  padding: 4rem 0 3rem;
+}
+
+.kicker {
+  display: inline-block;
+  background: rgba(13, 162, 231, 0.08);
+  color: #0da2e7;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+  border-width: 1px;
+  border-color: #0da2e7; 
+}
+
+.hero-title {
+  font-size: 3rem;
+  margin: 0.5rem 0;
+  background: linear-gradient(90deg, #00b4ff, #9b4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  color: #9fb6c8;
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+}
+
+.btn-cta {
+  display: inline-block;
+  padding: 0.6rem 1.25rem;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #00b4ff, #9b4dff);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(155, 77, 255, 0.4);
+}
+
+/* NEXT GAME CARD */
+.next-game {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.next-game h3 {
+  color: #9fb6c8;
+  margin-bottom: 1.5rem;
+}
+
+.next-card {
+  width: 560px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* GAMES LAYOUT (tab 2) */
+.site-container.games-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.games-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+/* Responsiveness */
+@media (max-width: 900px) {
+  .games-layout {
+    grid-template-columns: 1fr;
+  }
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .next-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
 }
