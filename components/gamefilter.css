@@ -1,0 +1,110 @@
+.game-filters {
+  width: 20rem;
+  padding: 1.5rem;
+  background-color: #0a0f18;
+  color: white;
+  border-radius: 0.75rem;
+  font-family: sans-serif;
+  min-height: 100vh;
+}
+
+.game-filters h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.search-wrapper {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-wrapper svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.search-input {
+  width: 100%;
+  background-color: #161b26;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  padding-left: 2.5rem;
+  color: white;
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #0095e8;
+}
+
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.category-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+  background-color: #111827;
+  border-color: #1f2937;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  font-weight: 600;
+}
+
+.category-button:hover:not(.active) {
+  background-color: #1f2937;
+}
+
+.category-button.active {
+  background-color: #0095e8;
+  border-color: #0095e8;
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.sort-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #1c222d;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sort-button:hover:not(.active) {
+  background-color: #374151;
+}
+
+.sort-button.active {
+  border-color: white;
+}
+
+.sort-button span {
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
