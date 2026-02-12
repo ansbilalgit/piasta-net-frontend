@@ -11,7 +11,7 @@ export function Header() {
 
         <nav className="header-links">
             <a href="/" className="nav-link">Home</a>
-            <a href="/GamesPage" className="nav-link">Game Library</a>
+            <a href="/games" className="nav-link">Game Library</a>
         </nav>
         <div className="header-right">
             <a href="/login" className="login-btn">

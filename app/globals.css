@@ -96,6 +96,11 @@
   color: #0da2e7;
 }
 
+.nav-link:focus {  /* Trying to get the selected tab to be colored */
+  color: #0da2e7;
+  outline: none;
+}
+
 .header-top {
   display: flex;
   align-items: center;
@@ -127,7 +132,6 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
-
 
 
 .footer {
@@ -166,6 +170,7 @@ body {
 /* ...existing code... */
 html, body {
   height: 100%;
+  background-color:#080c16; /* bg color */
 }
 
 .layout-wrapper {
@@ -259,6 +264,41 @@ html, body {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+
+/* GAMES HEADER */
+.games-header {
+  text-align: center; /* games available */
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.games-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.games-header-top h1 {
+  display: flex;
+  flex-direction: column;
+  font-size: 2.5rem;
+  margin: 0;
+  color: #ededed;
+}
+
+.games-icon {
+  font-size: 2.5rem;
+}
+
+.games-count {
+  color: #9fb6c8;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
 
 /* GAMES LAYOUT (tab 2) */
 .site-container.games-layout {
