@@ -11,7 +11,8 @@ export interface Item {
 }
 
 export interface ItemsResponse {
+  page: number;
+  pageSize: number;
+  totalCount: number;
   items: Item[];
-  success: boolean;
-  error?: string;
 }

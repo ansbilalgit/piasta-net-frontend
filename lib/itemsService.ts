@@ -1,5 +1,7 @@
 import { Item, ItemsResponse } from './types';
 
+const ITEMS_API_BASE_URL = 'https://piasta-net-app.azurewebsites.net/api/items/';
+
 /**
  * Fetches items from the API with optional filters
  * This abstraction allows easy migration from direct DB access to backend API
@@ -19,7 +21,8 @@ export async function fetchItems(
   if (typeof minTime === 'number') params.append('min_time', String(minTime));
   if (typeof maxTime === 'number') params.append('max_time', String(maxTime));
 
-  const response = await fetch(`/api/items?${params.toString()}`);
+  const url = `${ITEMS_API_BASE_URL}?${params.toString()}`;
+  const response = await fetch(url);
 
   if (!response.ok) {
     throw new Error('Failed to fetch items');
@@ -27,25 +30,17 @@ export async function fetchItems(
 
   const data: ItemsResponse = await response.json();
 
-  if (!data.success) {
-    throw new Error(data.error || 'Failed to fetch items');
-  }
-
   return data.items;
 }
 
 export async function fetchMaxLength(): Promise<number | null> {
-  const response = await fetch(`/api/items?get_max_length=1`);
+  const response = await fetch(`${ITEMS_API_BASE_URL}?get_max_length=1`);
 
   if (!response.ok) {
     throw new Error('Failed to fetch max length');
   }
 
   const data: any = await response.json();
-
-  if (!data.success) {
-    throw new Error(data.error || 'Failed to fetch max length');
-  }
 
   return typeof data.maxLength === 'number' ? data.maxLength : null;
 }
