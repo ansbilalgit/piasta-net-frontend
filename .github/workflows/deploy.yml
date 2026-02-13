@@ -29,6 +29,7 @@ jobs:
       run: |
           cp -r .next/static .next/standalone/.next/
           cp -r public .next/standalone/ || true
+          cp web.config .next/standalone/
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
