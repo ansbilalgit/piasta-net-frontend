@@ -15,8 +15,7 @@ jobs:
       uses: actions/setup-node@v6
       with:
         node-version: '20.x'
-        cache: 'npm'
-        
+                
     - name: Install dependencies
       run: npm ci
 
@@ -26,7 +25,8 @@ jobs:
     - name: Copy static assets
       run: |
           cp -r .next/static .next/standalone/.next/
-          cp -r public .next/standalone/ || true
+          cp -r public .next/standalone/ 
+          cp web.config .next/standalone/ || true
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
