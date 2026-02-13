@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v6
@@ -26,10 +26,8 @@ jobs:
     
     - name: Copy static assets
       run: |
-          Copy-Item -Recurse .next/static .next/standalone/.next/
-          Copy-Item -Recurse public .next/standalone/
-          Copy-Item web.config .next/standalone/ -ErrorAction SilentlyContinue
-      shell: pwsh
+          cp -r .next/static .next/standalone/.next/
+          cp -r public .next/standalone/ || true
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
