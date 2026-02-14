@@ -59,7 +59,8 @@ export default function GamesPage() {
 
         setCountsByType({ all, boardgame, videogame });
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         // Keep default counts on API failure.
       });
 
