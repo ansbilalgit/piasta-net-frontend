@@ -1,5 +1,5 @@
 // app/playground/page.tsx
-import { GameCard } from "@/components/Card";
+import { GameCard } from "@/app/components/Card";
 
 export default function Playground() {
     return (
