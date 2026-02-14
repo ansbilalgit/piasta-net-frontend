@@ -34,7 +34,8 @@ export default function GamesPage() {
           setMaxDuration(maxLength);
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error);
         // Keep defaults if API max value is unavailable.
       });
 
