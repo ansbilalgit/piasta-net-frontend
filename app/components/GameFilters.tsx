@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "./GameFilters.module.css";
 import RangeSlider from "./RangeSlider";
-import { GameTypeFilter } from "@/lib/types";
+import { GAME_FILTER_CATEGORIES, GameTypeFilter } from "@/lib/types";
 
 type GameFiltersProps = {
   activeTab: GameTypeFilter;
@@ -38,12 +38,6 @@ export default function GameFilters({
     setDraftRange([minDuration, maxDuration]);
   }, [minDuration, maxDuration]);
 
-  const categories: { name: string; type: GameTypeFilter }[] = [
-    { name: "All Games", type: "all" },
-    { name: "Board Games", type: "boardgame" },
-    { name: "Console Games", type: "videogame" },
-  ];
-
   const maxSliderValue = maxDurationLimit;
 
   return (
@@ -66,7 +60,7 @@ export default function GameFilters({
       </div>
 
       <div className={styles.categoryTabs}>
-        {categories.map((category) => (
+        {GAME_FILTER_CATEGORIES.map((category) => (
           <button
             key={category.name}
             type="button"

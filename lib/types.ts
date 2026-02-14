@@ -17,3 +17,14 @@ export interface ItemsResponse {
 }
 
 export type GameTypeFilter = "all" | "boardgame" | "videogame";
+
+export type GameFilterCategory = {
+  name: string;
+  type: GameTypeFilter;
+};
+
+export const GAME_FILTER_CATEGORIES: GameFilterCategory[] = [
+  { name: "All Games", type: "all" },
+  { name: "Board Games", type: "boardgame" },
+  { name: "Console Games", type: "videogame" },
+];
