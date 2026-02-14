@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { fetchItems } from "@/lib/itemsService";
-import { Item } from "@/lib/types";
+import { GameTypeFilter, Item } from "@/lib/types";
 import styles from "./GameItemsList.module.css";
 import Card from "./Card";
 
 type GameItemsListProps = {
   searchTerm: string;
-  activeTab: string;
+  activeTab: GameTypeFilter;
   activeSort: "A-Z" | "Z-A";
   minDuration: number;
   maxDuration: number;
@@ -56,7 +56,7 @@ export default function GameItemsList({
       try {
         const data = await fetchItems(
           debouncedFilters.searchTerm || undefined,
-          debouncedFilters.activeTab !== "All Games" ? debouncedFilters.activeTab : undefined,
+          debouncedFilters.activeTab === "all" ? undefined : debouncedFilters.activeTab,
           debouncedFilters.activeSort,
           debouncedFilters.minDuration,
           debouncedFilters.maxDuration

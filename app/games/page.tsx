@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import GameFilters from "../components/GameFilters";
 import GameItemsList from "../components/GameItemsList";
 import { fetchItemsCount, fetchMaxLength } from "@/lib/itemsService";
+import { GameTypeFilter } from "@/lib/types";
 import styles from "./page.module.css";
 
 export default function GamesPage() {
-  const [activeTab, setActiveTab] = useState("All Games");
+  const [activeTab, setActiveTab] = useState<GameTypeFilter>("all");
   const [activeSort, setActiveSort] = useState<"A-Z" | "Z-A">("A-Z");
   const [searchTerm, setSearchTerm] = useState("");
   const [minDuration, setMinDuration] = useState(0);

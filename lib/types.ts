@@ -15,3 +15,5 @@ export interface ItemsResponse {
   totalCount: number;
   items: Item[];
 }
+
+export type GameTypeFilter = "all" | "boardgame" | "videogame";

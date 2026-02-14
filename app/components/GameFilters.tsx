@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import styles from "./GameFilters.module.css";
 import RangeSlider from "./RangeSlider";
+import { GameTypeFilter } from "@/lib/types";
 
 type GameFiltersProps = {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: GameTypeFilter;
+  setActiveTab: (tab: GameTypeFilter) => void;
   activeSort: "A-Z" | "Z-A";
   setActiveSort: (sort: "A-Z" | "Z-A") => void;
   searchTerm: string;
@@ -37,8 +38,8 @@ export default function GameFilters({
     setDraftRange([minDuration, maxDuration]);
   }, [minDuration, maxDuration]);
 
-  const categories = [
-    { name: "All Games", type: "All Games" },
+  const categories: { name: string; type: GameTypeFilter }[] = [
+    { name: "All Games", type: "all" },
     { name: "Board Games", type: "boardgame" },
     { name: "Console Games", type: "videogame" },
   ];
