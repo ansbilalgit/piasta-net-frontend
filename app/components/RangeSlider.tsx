@@ -37,12 +37,19 @@ export default function RangeSlider({ min, max, step = 1, value, onChange, onFin
           </div>
         )}
         renderThumb={({ props, index }) => (
-          <div
-            {...props}
-            className={styles.thumb}
-            style={{ ...props.style }}
-            aria-label={index === 0 ? "Minimum duration" : "Maximum duration"}
-          />
+          (() => {
+            const { key, ...rest } = props;
+
+            return (
+              <div
+                key={key}
+                {...rest}
+                className={styles.thumb}
+                style={{ ...props.style }}
+                aria-label={index === 0 ? "Minimum duration" : "Maximum duration"}
+              />
+            );
+          })()
         )}
       />
     </div>
