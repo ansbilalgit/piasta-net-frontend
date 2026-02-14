@@ -57,6 +57,7 @@ export default function GameFilters({
         </svg>
         <input
           type="text"
+          aria-label="Search games"
           placeholder="Search games..."
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
@@ -121,6 +122,7 @@ export default function GameFilters({
         <div className={styles.numberInputs}>
           <input
             type="number"
+            aria-label="Minimum duration"
             min={0}
             max={maxSliderValue}
             value={draftRange[0]}
@@ -135,6 +137,7 @@ export default function GameFilters({
           />
           <input
             type="number"
+            aria-label="Maximum duration"
             min={0}
             max={maxSliderValue}
             value={draftRange[1]}
