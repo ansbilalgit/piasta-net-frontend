@@ -1,6 +1,6 @@
 import { Item, ItemsResponse } from "./types";
 
-const ITEMS_API_BASE_URL = "https://piasta-net-app.azurewebsites.net/api/items/";
+const ITEMS_API_BASE_URL = "/api/items";
 
 export async function fetchItems(
   search?: string,
@@ -65,6 +65,7 @@ export async function fetchMaxLength(): Promise<number | null> {
   }
 
   return null;
+
 }
 
 export async function fetchItemsCount(type?: string): Promise<number> {
