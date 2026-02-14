@@ -88,19 +88,7 @@ export async function fetchItemsCount(type?: string): Promise<number> {
   const response = await fetch(url, { cache: "no-store" });
 
   if (!response.ok) {
-    let errorDetails = "";
-    try {
-      const text = await response.text();
-      if (text) {
-        errorDetails = text.length > 200 ? `${text.slice(0, 200)}...` : text;
-      }
-    } catch {
-      // Ignore errors while reading the response body for error reporting.
-    }
-
-    const statusInfo = `status ${response.status}${response.statusText ? ` ${response.statusText}` : ""}`;
-    const detailsInfo = errorDetails ? `: ${errorDetails}` : "";
-    throw new Error(`Failed to fetch items count (${statusInfo})${detailsInfo}`);
+    throw new Error("Failed to fetch items count");
   }
 
   const data: ItemsResponse = await response.json();
