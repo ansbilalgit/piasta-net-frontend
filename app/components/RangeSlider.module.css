@@ -1,0 +1,35 @@
+.container {
+  width: 100%;
+  max-width: 16rem;
+  padding: 0.25rem 0;
+}
+
+.trackWrapper {
+  height: 8px;
+  display: flex;
+  width: 100%;
+}
+
+.trackBase {
+  height: 8px;
+  width: 100%;
+  border-radius: 6px;
+  background: #1f2937;
+  position: relative;
+}
+
+.trackSelected {
+  position: absolute;
+  height: 8px;
+  background: #0095e8;
+  border-radius: 6px;
+}
+
+.thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #0095e8;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,116 @@
+.filters {
+  background-color: #0a0f18;
+  border: 1px solid #1f2937;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #fff;
+  align-self: start;
+  position: sticky;
+  top: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
+.searchWrap {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.searchInput {
+  width: 100%;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  background: #161b26;
+  color: #fff;
+  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #0095e8;
+}
+
+.categoryTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.categoryButton {
+  border: 1px solid #1f2937;
+  background: #111827;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.sortButtons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sortButton {
+  border: 1px solid #1f2937;
+  background: #111827;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  min-width: 5rem;
+}
+
+.active {
+  border-color: #0095e8;
+  background: #0095e8;
+}
+
+.durationSection {
+  margin-top: 0.5rem;
+}
+
+.durationTitle {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.rangeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rangeInput {
+  width: 100%;
+}
+
+.numberInputs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.numberInput {
+  width: 100%;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  background: #161b26;
+  color: #fff;
+  padding: 0.5rem;
+}
