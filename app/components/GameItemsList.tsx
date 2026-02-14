@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchItems } from "@/lib/itemsService";
 import { GameTypeFilter, Item } from "@/lib/types";
 import styles from "./GameItemsList.module.css";
-import Card from "./Card";
+import { GameCard } from "./Card";
 
 type GameItemsListProps = {
   searchTerm: string;
@@ -132,15 +132,13 @@ export default function GameItemsList({
       {items.length > 0 && (
         <div className={styles.itemsGrid}>
           {items.map((item) => (
-            <Card
+            <GameCard
               key={item.id}
               title={item.name}
               category={getCategoryLabel(item)}
               description={item.description}
               players={"N/A"}
               duration={`${item.length} min`}
-              thumbnail={item.thumbnail ?? undefined}
-              copies={item.copies}
             />
           ))}
         </div>
