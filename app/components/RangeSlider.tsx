@@ -22,20 +22,24 @@ export default function RangeSlider({ min, max, step = 1, value, onChange, onFin
         values={value}
         onChange={(values) => onChange([values[0], values[1]])}
         onFinalChange={(values) => onFinalChange?.([values[0], values[1]])}
-        renderTrack={({ props, children }) => (
-          <div {...props} className={styles.trackWrapper}>
-            <div ref={props.ref} className={styles.trackBase}>
-              <div
-                className={styles.trackSelected}
-                style={{
-                  left: `${((value[0] - min) / (max - min)) * 100}%`,
-                  right: `${100 - ((value[1] - min) / (max - min)) * 100}%`,
-                }}
-              />
+        renderTrack={({ props, children }) => {
+          const { ref, ...trackProps } = props;
+
+          return (
+            <div ref={ref} {...trackProps} className={styles.trackWrapper}>
+              <div className={styles.trackBase}>
+                <div
+                  className={styles.trackSelected}
+                  style={{
+                    left: `${((value[0] - min) / (max - min)) * 100}%`,
+                    right: `${100 - ((value[1] - min) / (max - min)) * 100}%`,
+                  }}
+                />
+              </div>
+              {children}
             </div>
-            {children}
-          </div>
-        )}
+          );
+        }}
         renderThumb={({ props, index }) => (
           (() => {
             const { key, ...rest } = props;
