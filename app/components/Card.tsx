@@ -41,3 +41,7 @@ export default function Card({
     </article>
   );
 }
+
+  export function GameCard(props: CardProps) {
+    return <Card {...props} />;
+  }
