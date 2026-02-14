@@ -125,7 +125,8 @@ export default function GameFilters({
             value={draftRange[0]}
             onChange={(event) => {
               const value = Number(event.target.value) || 0;
-              const nextMin = Math.min(value, draftRange[1]);
+              const clampedValue = Math.min(Math.max(value, 0), maxSliderValue);
+              const nextMin = Math.min(clampedValue, draftRange[1]);
               setDraftRange([nextMin, draftRange[1]]);
               setMinDuration(nextMin);
             }}
@@ -138,7 +139,8 @@ export default function GameFilters({
             value={draftRange[1]}
             onChange={(event) => {
               const value = Number(event.target.value) || 0;
-              const nextMax = Math.max(value, draftRange[0]);
+              const clampedValue = Math.min(Math.max(value, 0), maxSliderValue);
+              const nextMax = Math.max(clampedValue, draftRange[0]);
               setDraftRange([draftRange[0], nextMax]);
               setMaxDuration(nextMax);
             }}
