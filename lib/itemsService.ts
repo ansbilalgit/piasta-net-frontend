@@ -29,7 +29,8 @@ export async function fetchItems(
     const response = await fetch(url, { cache: "no-store" });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch items");
+      const statusInfo = `${response.status}${response.statusText ? ` ${response.statusText}` : ""}`;
+      throw new Error(`Failed to fetch items: ${statusInfo}`);
     }
 
     const data: ItemsResponse = await response.json();
