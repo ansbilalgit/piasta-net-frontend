@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchItems } from "@/lib/itemsService";
-import { GameTypeFilter, Item } from "@/lib/types";
+import { GameTypeFilter, ITEM_TYPE, Item } from "@/lib/types";
 import styles from "./GameItemsList.module.css";
 import { GameCard } from "./Card";
 
@@ -106,11 +106,11 @@ export default function GameItemsList({
   }, [debouncedFilters]);
 
   const getCategoryLabel = (item: Item): string => {
-    if (item.type === 1) {
+    if (item.type === ITEM_TYPE.BOARDGAME) {
       return "Board Games";
     }
 
-    if (item.type === 0) {
+    if (item.type === ITEM_TYPE.VIDEOGAME) {
       return "Console Games";
     }
 

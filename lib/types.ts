@@ -18,6 +18,11 @@ export interface ItemsResponse {
 
 export type GameTypeFilter = "all" | "boardgame" | "videogame";
 
+export const ITEM_TYPE = {
+  VIDEOGAME: 0,
+  BOARDGAME: 1,
+} as const;
+
 export type GameFilterCategory = {
   name: string;
   type: GameTypeFilter;
