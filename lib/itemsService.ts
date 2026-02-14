@@ -59,12 +59,22 @@ export async function fetchMaxLength(): Promise<number | null> {
     typeof data === "object" &&
     data !== null &&
     "maxLength" in data &&
-    typeof (data as { maxLength: unknown }).maxLength === "number"
+    typeof (data as { maxLength: unknown }).maxLength === "number" &&
+    Number.isFinite((data as { maxLength: number }).maxLength)
   ) {
     return (data as { maxLength: number }).maxLength;
   }
 
-  return null;
+  const items = await fetchItems();
+  const lengths = items
+    .map((item) => Number(item.length))
+    .filter((length) => Number.isFinite(length));
+
+  if (lengths.length === 0) {
+    return null;
+  }
+
+  return Math.max(...lengths);
 
 }
 
