@@ -13,6 +13,7 @@ type GameFiltersProps = {
   setSearchTerm: (term: string) => void;
   minDuration: number;
   maxDuration: number;
+  maxDurationLimit: number;
   setMinDuration: (value: number) => void;
   setMaxDuration: (value: number) => void;
 };
@@ -26,6 +27,7 @@ export default function GameFilters({
   setSearchTerm,
   minDuration,
   maxDuration,
+  maxDurationLimit,
   setMinDuration,
   setMaxDuration,
 }: GameFiltersProps) {
@@ -41,7 +43,7 @@ export default function GameFilters({
     { name: "Console Games", type: "videogame" },
   ];
 
-  const maxSliderValue = 1200;
+  const maxSliderValue = maxDurationLimit;
 
   return (
     <aside className={styles.filters}>

@@ -12,6 +12,7 @@ export default function GamesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [minDuration, setMinDuration] = useState(0);
   const [maxDuration, setMaxDuration] = useState(240);
+  const [maxDurationLimit, setMaxDurationLimit] = useState(240);
   const [countsByType, setCountsByType] = useState({
     all: 0,
     boardgame: 0,
@@ -28,6 +29,7 @@ export default function GamesPage() {
         }
 
         if (typeof maxLength === "number" && !Number.isNaN(maxLength)) {
+          setMaxDurationLimit(maxLength);
           setMaxDuration(maxLength);
         }
       })
@@ -86,6 +88,7 @@ export default function GamesPage() {
           setSearchTerm={setSearchTerm}
           minDuration={minDuration}
           maxDuration={maxDuration}
+          maxDurationLimit={maxDurationLimit}
           setMinDuration={setMinDuration}
           setMaxDuration={setMaxDuration}
         />
