@@ -295,7 +295,6 @@ html, body {
 
 .games-count {
   display: flex;
-  flex-direction: column;
   justify-content: flex-start;
   color: #9fb6c8;
   margin: 0;
