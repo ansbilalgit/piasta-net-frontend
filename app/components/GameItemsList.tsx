@@ -138,7 +138,7 @@ export default function GameItemsList({
               category={getCategoryLabel(item)}
               description={item.description}
               players={"N/A"}
-              thumbnail={item.thumbnail}
+              thumbnail={item.thumbnail ?? ""}
               duration={`${item.length} min`}
             />
           ))}
