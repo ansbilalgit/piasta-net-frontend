@@ -1,4 +1,5 @@
 import Playground from "../playground/page";
+
 export default function GamesPage() {
   return (
     <div className="site-container">
@@ -10,18 +11,7 @@ export default function GamesPage() {
         <p className="games-count">12 games available</p>
       </div>
 
-      <div className="site-container games-layout">
-        <aside className="filters">
-          <div className="filter-card">
-            {/* Filter-innehål läggs till senare */}
-          </div>
-        </aside>
-
-        <section className="">
-          {/* Game cards läggs till senare */}
-          <Playground></Playground>
-        </section>
-      </div>
+      <Playground />
     </div>
   );
 }
