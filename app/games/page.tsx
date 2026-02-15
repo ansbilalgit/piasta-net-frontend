@@ -1,3 +1,4 @@
+import Playground from "../playground/page";
 export default function GamesPage() {
   return (
     <div className="site-container">
@@ -16,8 +17,9 @@ export default function GamesPage() {
           </div>
         </aside>
 
-        <section className="games-grid">
+        <section className="">
           {/* Game cards läggs till senare */}
+          <Playground></Playground>
         </section>
       </div>
     </div>
