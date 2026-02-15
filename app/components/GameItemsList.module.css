@@ -23,7 +23,8 @@
 
 .itemsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  /* This creates exactly 3 equal-width columns */
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
 }
 
