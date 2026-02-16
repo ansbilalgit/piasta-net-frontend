@@ -1,3 +1,5 @@
+import { ParticipantCounter } from "./components/ParticipantsCard";
+
 export default function HomePage() {
   return (
     <div className="site-container">
@@ -11,7 +13,7 @@ export default function HomePage() {
       <section className="next-game">
         <h3>Next Game Night — Every Tuesday</h3>
         <div className="next-card">
-          {/* Innehåll läggs till senare */}
+          <ParticipantCounter />
         </div>
       </section>
     </div>

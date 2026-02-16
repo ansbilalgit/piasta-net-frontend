@@ -59,3 +59,18 @@
   color: #9ca3af;
   font-size: 0.75rem;
 }
+
+@media (max-width: 600px) {
+  .itemThumbnailWrapper {
+    height: 120px;
+  }
+  .itemName {
+    font-size: 0.95rem;
+  }
+  .itemType {
+    font-size: 0.7rem;
+  }
+  .itemDescription {
+    font-size: 0.8rem;
+  }
+}
