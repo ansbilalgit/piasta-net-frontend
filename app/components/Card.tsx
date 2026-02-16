@@ -42,7 +42,7 @@ export function GameCard({
 
                 {/* Thumbnail Image Section */}
                 {thumbnail && (
-                    <div className="w-full h-48 mb-5 rounded-xl overflow-hidden bg-slate-800/50 flex-shrink-0">
+                    <div className="w-full h-48 mb-5 rounded-xl overflow-hidden bg-slate-800/50 shrink-0">
                         <img
                             src={thumbnail}
                             alt={`${title} cover`}
@@ -54,7 +54,7 @@ export function GameCard({
                 {/* Header Section */}
                 <div className="flex items-start justify-between mb-3">
                     <h2 className="text-white text-2xl font-semibold">{title}</h2>
-                    <span className="flex items-center gap-1.5 bg-emerald-900/40 text-emerald-400 px-3 py-1.5 rounded-lg text-sm border border-emerald-700/50 flex-shrink-0 ml-2">
+                    <span className="flex items-center gap-1.5 bg-emerald-900/40 text-emerald-400 px-3 py-1.5 rounded-lg text-sm border border-emerald-700/50 shrink-0 ml-2">
                         {category}
                     </span>
                 </div>
