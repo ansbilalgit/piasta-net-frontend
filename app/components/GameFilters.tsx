@@ -162,8 +162,9 @@ function GameFilters({
           />
         </div>
 
-        {/* Category filter toggle button */}
-        <div style={{ margin: '1rem 0', display: 'flex', justifyContent: 'center' }}>
+        {/* Category filter toggle button with label */}
+        <div style={{ margin: '1rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+          <span style={{ fontWeight: 500 }}>Categories</span>
           <button
             type="button"
             className={styles.categoryButton}
