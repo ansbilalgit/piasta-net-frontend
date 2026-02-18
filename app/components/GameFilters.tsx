@@ -57,7 +57,7 @@ function GameFilters({
   const maxSliderValue = maxDurationLimit;
 
   return (
-    <aside className={styles.filters}>
+    <aside className={styles.filters} style={{ overflowY: 'auto', maxHeight: '100vh' }}>
       <h2 className={styles.title}>Filters</h2>
 
       <div className={styles.searchWrap}>
