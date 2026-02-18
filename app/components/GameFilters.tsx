@@ -17,6 +17,10 @@ type GameFiltersProps = {
   maxDurationLimit: number;
   setMinDuration: (value: number) => void;
   setMaxDuration: (value: number) => void;
+  itemCategories: string[];
+  onCategoryClick: (category: string | null) => void;
+  // Accept null to clear filter
+  activeCategory?: string | null;
 };
 
 export default function GameFilters({
@@ -31,6 +35,9 @@ export default function GameFilters({
   maxDurationLimit,
   setMinDuration,
   setMaxDuration,
+  itemCategories,
+  onCategoryClick,
+  activeCategory,
 }: GameFiltersProps) {
   const [draftRange, setDraftRange] = useState<[number, number]>([minDuration, maxDuration]);
 
@@ -146,6 +153,25 @@ export default function GameFilters({
           />
         </div>
       </section>
+
+      {itemCategories && itemCategories.length > 0 && (
+        <div className={styles.categoryButtonsExtra} style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {itemCategories.map((category: string) => {
+            const isActive = activeCategory === category;
+            return (
+              <button
+                key={category}
+                type="button"
+                className={`${styles.categoryButton} ${isActive ? styles.active : ''}`}
+                onClick={() => onCategoryClick(isActive ? null : category)}
+                aria-pressed={isActive}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </aside>
   );
 }

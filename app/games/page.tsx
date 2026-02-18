@@ -3,11 +3,36 @@
 import { useEffect, useState } from "react";
 import GameFilters from "../components/GameFilters";
 import GameItemsList from "../components/GameItemsList";
+import { fetchItems } from "@/lib/itemsService";
+
 import { fetchItemsCount, fetchMaxLength } from "@/lib/itemsService";
 import { GameTypeFilter } from "@/lib/types";
 import styles from "./page.module.css";
 
+
 export default function GamesPage() {
+  const [itemCategories, setItemCategories] = useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  // Fetch categories from all items on mount
+  useEffect(() => {
+    let mounted = true;
+    fetchItems()
+      .then((data) => {
+        if (!mounted) return;
+        const counts: Record<string, number> = {};
+        data.forEach((item) => {
+          item.categories.forEach((cat) => {
+            counts[cat] = (counts[cat] || 0) + 1;
+          });
+        });
+        const sorted = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([cat]) => cat);
+        setItemCategories(sorted);
+      });
+    return () => { mounted = false; };
+  }, []);
+
   const [activeTab, setActiveTab] = useState<GameTypeFilter>("all");
   const [activeSort, setActiveSort] = useState<"A-Z" | "Z-A">("A-Z");
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,6 +119,9 @@ export default function GamesPage() {
           maxDurationLimit={maxDurationLimit}
           setMinDuration={setMinDuration}
           setMaxDuration={setMaxDuration}
+          itemCategories={itemCategories}
+          onCategoryClick={setActiveCategory}
+          activeCategory={activeCategory}
         />
         <GameItemsList
           searchTerm={searchTerm}
@@ -101,6 +129,7 @@ export default function GamesPage() {
           activeSort={activeSort}
           minDuration={minDuration}
           maxDuration={maxDuration}
+          filterCategory={activeCategory}
         />
       </div>
     </div>

@@ -12,6 +12,7 @@ type GameItemsListProps = {
   activeSort: "A-Z" | "Z-A";
   minDuration: number;
   maxDuration: number;
+  filterCategory?: string | null;
 };
 
 export default function GameItemsList({
@@ -20,6 +21,7 @@ export default function GameItemsList({
   activeSort,
   minDuration,
   maxDuration,
+  filterCategory,
 }: GameItemsListProps) {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
@@ -30,7 +32,11 @@ export default function GameItemsList({
     activeSort,
     minDuration,
     maxDuration,
+    filterCategory,
   });
+  // Local state for category counts and sorted categories (not used in UI, but required for logic)
+  const [itemCategoryCounts, setItemCategoryCounts] = useState<Record<string, number>>({});
+  const [sortedItemCategories, setSortedItemCategories] = useState<string[]>([]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -40,11 +46,12 @@ export default function GameItemsList({
         activeSort,
         minDuration,
         maxDuration,
+        filterCategory,
       });
     }, 150);
 
     return () => clearTimeout(timeout);
-  }, [searchTerm, activeTab, activeSort, minDuration, maxDuration]);
+  }, [searchTerm, activeTab, activeSort, minDuration, maxDuration, filterCategory]);
 
   useEffect(() => {
     let mounted = true;
@@ -62,21 +69,21 @@ export default function GameItemsList({
           debouncedFilters.maxDuration
         );
 
-        // Count category usage
-        const categoryCountsTemp: Record<string, number> = {};
+        // Count item.categories usage (not type)
+        const itemCategoryCountsTemp: Record<string, number> = {};
         data.forEach((item) => {
           item.categories.forEach((category) => {
-            categoryCountsTemp[category] = (categoryCountsTemp[category] || 0) + 1;
+            itemCategoryCountsTemp[category] = (itemCategoryCountsTemp[category] || 0) + 1;
           });
         });
-        // Sort categories by usage
-        const sortedCategoriesTemp = Object.entries(categoryCountsTemp)
+        // Sort item.categories by usage
+        const sortedItemCategoriesTemp = Object.entries(itemCategoryCountsTemp)
           .sort((a, b) => b[1] - a[1])
           .map(([category]) => category);
 
         if (mounted) {
-          setCategoryCounts(categoryCountsTemp);
-          setSortedCategories(sortedCategoriesTemp);
+          setItemCategoryCounts(itemCategoryCountsTemp);
+          setSortedItemCategories(sortedItemCategoriesTemp);
         }
 
         const normalizedSearch = debouncedFilters.searchTerm.trim().toLowerCase();
@@ -84,12 +91,16 @@ export default function GameItemsList({
           ? data.filter((item) => item.name.toLowerCase().includes(normalizedSearch))
           : data;
 
-        const byDuration = byName.filter((item) => {
+        // Filter by category if set
+        const byCategory = debouncedFilters.filterCategory
+          ? byName.filter((item) => item.categories.includes(debouncedFilters.filterCategory!))
+          : byName;
+
+        const byDuration = byCategory.filter((item) => {
           const length = Number(item.length);
           if (Number.isNaN(length)) {
             return false;
           }
-
           return length >= debouncedFilters.minDuration && length <= debouncedFilters.maxDuration;
         });
 
@@ -122,7 +133,8 @@ export default function GameItemsList({
     };
   }, [debouncedFilters]);
 
-  const getCategoryLabel = (item: Item): string => {
+  // Returns a label based on the item's type (type-based category)
+  const getTypeCategoryLabel = (item: Item): string => {
     if (item.type === ITEM_TYPE.BOARDGAME) {
       return "Board Games";
     }
@@ -131,11 +143,11 @@ export default function GameItemsList({
       return "Console Games";
     }
 
-    return item.categories[0] ?? "Unknown";
+    return "Other";
   };
 
-  const [sortedCategories, setSortedCategories] = useState<string[]>([]);
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
+  // These are based on item.categories (not type)
+  // Now lifted to parent (GamesPage) for filter UI
 
   return (
     <section className={styles.itemsContainer}>
@@ -144,6 +156,8 @@ export default function GameItemsList({
           Items <span className={styles.itemCount}>({items.length})</span>
         </h2>
       </div>
+
+
 
       {error && <div className={styles.errorMessage}>{error}</div>}
       {loading && items.length === 0 && <div className={styles.loadingMessage}>Loading items...</div>}
@@ -155,7 +169,7 @@ export default function GameItemsList({
             <GameCard
               key={item.id}
               title={item.name}
-              category={getCategoryLabel(item)}
+              category={getTypeCategoryLabel(item)}
               description={item.description}
               players={"N/A"}
               duration={`${item.length} min`}
