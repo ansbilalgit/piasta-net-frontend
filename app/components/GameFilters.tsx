@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -21,8 +22,7 @@ type GameFiltersProps = {
   onCategoryClick: (category: string) => void;
   activeCategories: string[];
 };
-
-export default function GameFilters({
+function GameFilters({
   activeTab,
   setActiveTab,
   activeSort,
@@ -37,8 +37,18 @@ export default function GameFilters({
   itemCategories,
   onCategoryClick,
   activeCategories,
-}: GameFiltersProps) {
+}: GameFiltersProps)  {
   const [draftRange, setDraftRange] = useState<[number, number]>([minDuration, maxDuration]);
+  // Category filter state: 'top10', 'all', 'none'
+  const [categoryView, setCategoryView] = useState<'top10' | 'all' | 'none'>('top10');
+
+  // Compute filtered categories based on toggle state
+  let filteredCategories: string[] = [];
+  if (categoryView === 'all') {
+    filteredCategories = itemCategories;
+  } else if (categoryView === 'top10') {
+    filteredCategories = itemCategories.slice(0, 10);
+  } // 'none' will show no categories
 
   useEffect(() => {
     setDraftRange([minDuration, maxDuration]);
@@ -151,11 +161,26 @@ export default function GameFilters({
             className={styles.numberInput}
           />
         </div>
+
+        {/* Category filter toggle button */}
+        <div style={{ margin: '1rem 0', display: 'flex', justifyContent: 'center' }}>
+          <button
+            type="button"
+            className={styles.categoryButton}
+            onClick={() => {
+              setCategoryView((prev) =>
+                prev === 'top10' ? 'all' : prev === 'all' ? 'none' : 'top10'
+              );
+            }}
+          >
+            {categoryView === 'top10' ? 'Top 10' : categoryView === 'all' ? 'All' : 'None'}
+          </button>
+        </div>
       </section>
 
-      {itemCategories && itemCategories.length > 0 && (
+      {filteredCategories && filteredCategories.length > 0 && (
         <div className={styles.categoryButtonsExtra} style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-          {itemCategories.map((category: string) => {
+          {filteredCategories.map((category: string) => {
             const isActive = activeCategories.includes(category);
             return (
               <button
@@ -174,3 +199,4 @@ export default function GameFilters({
     </aside>
   );
 }
+export default GameFilters;
