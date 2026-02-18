@@ -12,7 +12,7 @@ import styles from "./page.module.css";
 
 export default function GamesPage() {
   const [itemCategories, setItemCategories] = useState<string[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategories, setActiveCategories] = useState<string[]>([]);
   // Fetch categories from all items on mount
   useEffect(() => {
     let mounted = true;
@@ -120,8 +120,14 @@ export default function GamesPage() {
           setMinDuration={setMinDuration}
           setMaxDuration={setMaxDuration}
           itemCategories={itemCategories}
-          onCategoryClick={setActiveCategory}
-          activeCategory={activeCategory}
+          onCategoryClick={(category) => {
+            setActiveCategories((prev) =>
+              prev.includes(category)
+                ? prev.filter((c) => c !== category)
+                : [...prev, category]
+            );
+          }}
+          activeCategories={activeCategories}
         />
         <GameItemsList
           searchTerm={searchTerm}
@@ -129,7 +135,7 @@ export default function GamesPage() {
           activeSort={activeSort}
           minDuration={minDuration}
           maxDuration={maxDuration}
-          filterCategory={activeCategory}
+          filterCategories={activeCategories}
         />
       </div>
     </div>

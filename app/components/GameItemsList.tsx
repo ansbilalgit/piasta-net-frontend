@@ -12,16 +12,15 @@ type GameItemsListProps = {
   activeSort: "A-Z" | "Z-A";
   minDuration: number;
   maxDuration: number;
-  filterCategory?: string | null;
+  filterCategories?: string[];
 };
-
 export default function GameItemsList({
   searchTerm,
   activeTab,
   activeSort,
   minDuration,
   maxDuration,
-  filterCategory,
+  filterCategories = [],
 }: GameItemsListProps) {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
@@ -32,7 +31,7 @@ export default function GameItemsList({
     activeSort,
     minDuration,
     maxDuration,
-    filterCategory,
+    filterCategories,
   });
   // Local state for category counts and sorted categories (not used in UI, but required for logic)
   const [itemCategoryCounts, setItemCategoryCounts] = useState<Record<string, number>>({});
@@ -46,12 +45,12 @@ export default function GameItemsList({
         activeSort,
         minDuration,
         maxDuration,
-        filterCategory,
+        filterCategories,
       });
     }, 150);
 
     return () => clearTimeout(timeout);
-  }, [searchTerm, activeTab, activeSort, minDuration, maxDuration, filterCategory]);
+  }, [searchTerm, activeTab, activeSort, minDuration, maxDuration, filterCategories]);
 
   useEffect(() => {
     let mounted = true;
@@ -91,9 +90,9 @@ export default function GameItemsList({
           ? data.filter((item) => item.name.toLowerCase().includes(normalizedSearch))
           : data;
 
-        // Filter by category if set
-        const byCategory = debouncedFilters.filterCategory
-          ? byName.filter((item) => item.categories.includes(debouncedFilters.filterCategory!))
+        // Filter by categories if set (all selected must be present)
+        const byCategory = debouncedFilters.filterCategories && debouncedFilters.filterCategories.length > 0
+          ? byName.filter((item) => debouncedFilters.filterCategories!.every((cat) => item.categories.includes(cat)))
           : byName;
 
         const byDuration = byCategory.filter((item) => {
