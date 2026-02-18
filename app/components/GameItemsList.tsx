@@ -62,6 +62,23 @@ export default function GameItemsList({
           debouncedFilters.maxDuration
         );
 
+        // Count category usage
+        const categoryCountsTemp: Record<string, number> = {};
+        data.forEach((item) => {
+          item.categories.forEach((category) => {
+            categoryCountsTemp[category] = (categoryCountsTemp[category] || 0) + 1;
+          });
+        });
+        // Sort categories by usage
+        const sortedCategoriesTemp = Object.entries(categoryCountsTemp)
+          .sort((a, b) => b[1] - a[1])
+          .map(([category]) => category);
+
+        if (mounted) {
+          setCategoryCounts(categoryCountsTemp);
+          setSortedCategories(sortedCategoriesTemp);
+        }
+
         const normalizedSearch = debouncedFilters.searchTerm.trim().toLowerCase();
         const byName = normalizedSearch
           ? data.filter((item) => item.name.toLowerCase().includes(normalizedSearch))
@@ -116,6 +133,9 @@ export default function GameItemsList({
 
     return item.categories[0] ?? "Unknown";
   };
+
+  const [sortedCategories, setSortedCategories] = useState<string[]>([]);
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
 
   return (
     <section className={styles.itemsContainer}>
