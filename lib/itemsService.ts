@@ -20,9 +20,6 @@ export async function fetchItems(
   let page = 1;
   let totalCount = Infinity;
   const allItems: Item[] = [];
-  function randomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   while (allItems.length < totalCount) {
     const params = new URLSearchParams(baseParams);
@@ -39,22 +36,7 @@ export async function fetchItems(
     const data: ItemsResponse = await response.json();
     totalCount = data.totalCount;
     // Patch each item with minPlayers/maxPlayers
-    const patchedItems = data.items.map((item) => {
-      let minPlayers = item.minPlayers;
-      let maxPlayers = item.maxPlayers;
-      if (typeof minPlayers !== "number") {
-        minPlayers = randomInt(1, 4);
-      }
-      if (typeof maxPlayers !== "number" || maxPlayers < minPlayers) {
-        maxPlayers = randomInt(minPlayers, 12);
-      }
-      return {
-        ...item,
-        minPlayers,
-        maxPlayers,
-      };
-    });
-    allItems.push(...patchedItems);
+    allItems.push(...data.items);
 
     if (data.items.length === 0 || allItems.length >= totalCount) {
       break;
