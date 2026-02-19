@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,9 +18,16 @@ type GameFiltersProps = {
   maxDurationLimit: number;
   setMinDuration: (value: number) => void;
   setMaxDuration: (value: number) => void;
+  minPlayers: number;
+  maxPlayers: number;
+  maxPlayersLimit: number;
+  setMinPlayers: (value: number) => void;
+  setMaxPlayers: (value: number) => void;
+  itemCategories: string[];
+  onCategoryClick: (category: string) => void;
+  activeCategories: string[];
 };
-
-export default function GameFilters({
+function GameFilters({
   activeTab,
   setActiveTab,
   activeSort,
@@ -31,17 +39,42 @@ export default function GameFilters({
   maxDurationLimit,
   setMinDuration,
   setMaxDuration,
-}: GameFiltersProps) {
+  minPlayers,
+  maxPlayers,
+  maxPlayersLimit,
+  setMinPlayers,
+  setMaxPlayers,
+  itemCategories,
+  onCategoryClick,
+  activeCategories,
+}: GameFiltersProps)  {
   const [draftRange, setDraftRange] = useState<[number, number]>([minDuration, maxDuration]);
+  // Category filter state: 'top10', 'all', 'none'
+  const [categoryView, setCategoryView] = useState<'top10' | 'all' | 'none'>('top10');
+  // Player range slider state
+  const [draftPlayerRange, setDraftPlayerRange] = useState<[number, number]>([minPlayers, maxPlayers]);
+
+  // Compute filtered categories based on toggle state
+  let filteredCategories: string[] = [];
+  if (categoryView === 'all') {
+    filteredCategories = itemCategories;
+  } else if (categoryView === 'top10') {
+    filteredCategories = itemCategories.slice(0, 10);
+  } // 'none' will show no categories
 
   useEffect(() => {
     setDraftRange([minDuration, maxDuration]);
   }, [minDuration, maxDuration]);
 
+  useEffect(() => {
+    setDraftPlayerRange([minPlayers, maxPlayers]);
+  }, [minPlayers, maxPlayers]);
+
   const maxSliderValue = maxDurationLimit;
+  const maxPlayersSliderValue = maxPlayersLimit;
 
   return (
-    <aside className={styles.filters}>
+    <aside className={styles.filters} style={{ overflowY: 'auto', maxHeight: '100vh' }}>
       <h2 className={styles.title}>Filters</h2>
 
       <div className={styles.searchWrap}>
@@ -96,17 +129,19 @@ export default function GameFilters({
           <RangeSlider
             min={0}
             max={maxSliderValue}
-            value={draftRange}
+            value={[Math.min(draftRange[0], draftRange[1]), Math.max(draftRange[0], draftRange[1])]}
             onChange={(values) => {
               const [low, high] = values;
-              const clampedLow = Math.min(Math.max(low, 0), high);
-              const clampedHigh = Math.max(Math.min(high, maxSliderValue), clampedLow);
+              const sorted = [Math.min(low, high), Math.max(low, high)];
+              const clampedLow = Math.min(Math.max(sorted[0], 0), sorted[1]);
+              const clampedHigh = Math.max(Math.min(sorted[1], maxSliderValue), clampedLow);
               setDraftRange([clampedLow, clampedHigh]);
             }}
             onFinalChange={(values) => {
               const [low, high] = values;
-              const clampedLow = Math.min(Math.max(low, 0), high);
-              const clampedHigh = Math.max(Math.min(high, maxSliderValue), clampedLow);
+              const sorted = [Math.min(low, high), Math.max(low, high)];
+              const clampedLow = Math.min(Math.max(sorted[0], 0), sorted[1]);
+              const clampedHigh = Math.max(Math.min(sorted[1], maxSliderValue), clampedLow);
               setMinDuration(clampedLow);
               setMaxDuration(clampedHigh);
             }}
@@ -145,7 +180,102 @@ export default function GameFilters({
             className={styles.numberInput}
           />
         </div>
+
+        {/* Player range slider section */}
+        <div style={{ margin: '1rem 0' }}>
+          <h3 className={styles.durationTitle}>Players</h3>
+          <div className={styles.rangeGroup}>
+            <RangeSlider
+              min={1}
+              max={maxPlayersSliderValue}
+              value={[Math.min(draftPlayerRange[0], draftPlayerRange[1]), Math.max(draftPlayerRange[0], draftPlayerRange[1])]}
+              onChange={(values) => {
+                const [low, high] = values;
+                const sorted = [Math.min(low, high), Math.max(low, high)];
+                const clampedLow = Math.min(Math.max(sorted[0], 1), sorted[1]);
+                const clampedHigh = Math.max(Math.min(sorted[1], maxPlayersSliderValue), clampedLow);
+                setDraftPlayerRange([clampedLow, clampedHigh]);
+              }}
+              onFinalChange={(values) => {
+                const [low, high] = values;
+                const sorted = [Math.min(low, high), Math.max(low, high)];
+                const clampedLow = Math.min(Math.max(sorted[0], 1), sorted[1]);
+                const clampedHigh = Math.max(Math.min(sorted[1], maxPlayersSliderValue), clampedLow);
+                setMinPlayers(clampedLow);
+                setMaxPlayers(clampedHigh);
+              }}
+            />
+          </div>
+          <div className={styles.numberInputs}>
+            <input
+              type="number"
+              aria-label="Minimum players"
+              min={1}
+              max={maxPlayersSliderValue}
+              value={draftPlayerRange[0]}
+              onChange={(event) => {
+                const value = Number(event.target.value) || 1;
+                const clampedValue = Math.min(Math.max(value, 1), maxPlayersSliderValue);
+                const nextMin = Math.min(clampedValue, draftPlayerRange[1]);
+                setDraftPlayerRange([nextMin, draftPlayerRange[1]]);
+                setMinPlayers(nextMin);
+              }}
+              className={styles.numberInput}
+            />
+            <input
+              type="number"
+              aria-label="Maximum players"
+              min={1}
+              max={maxPlayersSliderValue}
+              value={draftPlayerRange[1]}
+              onChange={(event) => {
+                const value = Number(event.target.value) || 1;
+                const clampedValue = Math.min(Math.max(value, 1), maxPlayersSliderValue);
+                const nextMax = Math.max(clampedValue, draftPlayerRange[0]);
+                setDraftPlayerRange([draftPlayerRange[0], nextMax]);
+                setMaxPlayers(nextMax);
+              }}
+              className={styles.numberInput}
+            />
+          </div>
+        </div>
+
+        {/* Category filter toggle button with label */}
+        <div style={{ margin: '1rem 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+          <span style={{ fontWeight: 500 }}>Categories</span>
+          <button
+            type="button"
+            className={styles.categoryButton}
+            onClick={() => {
+              setCategoryView((prev) =>
+                prev === 'top10' ? 'all' : prev === 'all' ? 'none' : 'top10'
+              );
+            }}
+          >
+            {categoryView === 'top10' ? 'Top 10' : categoryView === 'all' ? 'All' : 'None'}
+          </button>
+        </div>
       </section>
+
+      {filteredCategories && filteredCategories.length > 0 && (
+        <div className={styles.categoryButtonsExtra} style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          {filteredCategories.map((category: string) => {
+            const isActive = activeCategories.includes(category);
+            return (
+              <button
+                key={category}
+                type="button"
+                className={`${styles.categoryButton} ${isActive ? styles.active : ''}`}
+                onClick={() => onCategoryClick(category)}
+                aria-pressed={isActive}
+              >
+                {category}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </aside>
   );
 }
+export default GameFilters;

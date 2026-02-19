@@ -3,11 +3,50 @@
 import { useEffect, useState } from "react";
 import GameFilters from "../components/GameFilters";
 import GameItemsList from "../components/GameItemsList";
+import { fetchItems } from "@/lib/itemsService";
+
 import { fetchItemsCount, fetchMaxLength } from "@/lib/itemsService";
 import { GameTypeFilter } from "@/lib/types";
 import styles from "./page.module.css";
 
+
 export default function GamesPage() {
+  const [itemCategories, setItemCategories] = useState<string[]>([]);
+  const [activeCategories, setActiveCategories] = useState<string[]>([]);
+  const [minPlayers, setMinPlayers] = useState(1);
+  const [maxPlayers, setMaxPlayers] = useState(10);
+  const [maxPlayersLimit, setMaxPlayersLimit] = useState(10);
+  // Fetch categories and player range from all items on mount
+  useEffect(() => {
+    let mounted = true;
+    fetchItems()
+      .then((data) => {
+        if (!mounted) return;
+        const counts: Record<string, number> = {};
+        let minPlayersVal = Infinity;
+        let maxPlayersVal = -Infinity;
+        data.forEach((item) => {
+          item.categories.forEach((cat) => {
+            counts[cat] = (counts[cat] || 0) + 1;
+          });
+          // Assume default values if missing
+          const itemMin = typeof item.minPlayers === "number" ? item.minPlayers : 1;
+          const itemMax = typeof item.maxPlayers === "number" ? item.maxPlayers : 10;
+          minPlayersVal = Math.min(minPlayersVal, itemMin);
+          maxPlayersVal = Math.max(maxPlayersVal, itemMax);
+        });
+        const sorted = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([cat]) => cat);
+        setItemCategories(sorted);
+        // If no items, fallback to defaults
+        setMinPlayers(minPlayersVal === Infinity ? 1 : minPlayersVal);
+        setMaxPlayers(maxPlayersVal === -Infinity ? 10 : maxPlayersVal);
+        setMaxPlayersLimit(maxPlayersVal === -Infinity ? 10 : maxPlayersVal);
+      });
+    return () => { mounted = false; };
+  }, []);
+
   const [activeTab, setActiveTab] = useState<GameTypeFilter>("all");
   const [activeSort, setActiveSort] = useState<"A-Z" | "Z-A">("A-Z");
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,6 +133,20 @@ export default function GamesPage() {
           maxDurationLimit={maxDurationLimit}
           setMinDuration={setMinDuration}
           setMaxDuration={setMaxDuration}
+          minPlayers={minPlayers}
+          maxPlayers={maxPlayers}
+          maxPlayersLimit={maxPlayersLimit}
+          setMinPlayers={setMinPlayers}
+          setMaxPlayers={setMaxPlayers}
+          itemCategories={itemCategories}
+          onCategoryClick={(category) => {
+            setActiveCategories((prev) =>
+              prev.includes(category)
+                ? prev.filter((c) => c !== category)
+                : [...prev, category]
+            );
+          }}
+          activeCategories={activeCategories}
         />
         <GameItemsList
           searchTerm={searchTerm}
@@ -101,6 +154,9 @@ export default function GamesPage() {
           activeSort={activeSort}
           minDuration={minDuration}
           maxDuration={maxDuration}
+          minPlayers={minPlayers}
+          maxPlayers={maxPlayers}
+          filterCategories={activeCategories}
         />
       </div>
     </div>
