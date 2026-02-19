@@ -12,6 +12,8 @@ type GameItemsListProps = {
   activeSort: "A-Z" | "Z-A";
   minDuration: number;
   maxDuration: number;
+  minPlayers: number;
+  maxPlayers: number;
   filterCategories?: string[];
 };
 export default function GameItemsList({
@@ -20,6 +22,8 @@ export default function GameItemsList({
   activeSort,
   minDuration,
   maxDuration,
+  minPlayers,
+  maxPlayers,
   filterCategories = [],
 }: GameItemsListProps) {
   const [items, setItems] = useState<Item[]>([]);
@@ -31,6 +35,8 @@ export default function GameItemsList({
     activeSort,
     minDuration,
     maxDuration,
+    minPlayers,
+    maxPlayers,
     filterCategories,
   });
   // Local state for category counts and sorted categories (not used in UI, but required for logic)
@@ -45,12 +51,14 @@ export default function GameItemsList({
         activeSort,
         minDuration,
         maxDuration,
+        minPlayers,
+        maxPlayers,
         filterCategories,
       });
     }, 150);
 
     return () => clearTimeout(timeout);
-  }, [searchTerm, activeTab, activeSort, minDuration, maxDuration, filterCategories]);
+  }, [searchTerm, activeTab, activeSort, minDuration, maxDuration, minPlayers, maxPlayers, filterCategories]);
 
   useEffect(() => {
     let mounted = true;
@@ -95,7 +103,17 @@ export default function GameItemsList({
           ? byName.filter((item) => debouncedFilters.filterCategories!.every((cat) => item.categories.includes(cat)))
           : byName;
 
-        const byDuration = byCategory.filter((item) => {
+        // Filter by player range (default MinPlayers=1, MaxPlayers=10)
+        const byPlayers = byCategory.filter((item) => {
+          const minPlayers = typeof item.minPlayers === "number" ? item.minPlayers : 1;
+          const maxPlayers = typeof item.maxPlayers === "number" ? item.maxPlayers : 10;
+          return (
+            minPlayers <= (debouncedFilters.maxPlayers ?? 10) &&
+            maxPlayers >= (debouncedFilters.minPlayers ?? 1)
+          );
+        });
+
+        const byDuration = byPlayers.filter((item) => {
           const length = Number(item.length);
           if (Number.isNaN(length)) {
             return false;
@@ -170,7 +188,7 @@ export default function GameItemsList({
               title={item.name}
               category={getTypeCategoryLabel(item)}
               description={item.description}
-              players={"N/A"}
+              players={`${item.minPlayers}–${item.maxPlayers}`}
               duration={`${item.length} min`}
             />
           ))}
