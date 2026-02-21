@@ -1,3 +1,52 @@
+.input-x-wrapper input[type="time"] {
+  padding-right: 2rem;
+}
+.input-x-reset {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #ff3333;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+  line-height: 1;
+}
+/* Game Event Dialog custom field styles */
+.dialog-label-flex {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.input-x-wrapper {
+  position: relative;
+  display: inline-block;
+}
+.input-x-reset {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  z-index: 2;
+}
+.dialog-reset-btn {
+  background: none;
+  border: 1px solid #00b4ff;
+  color: #00b4ff;
+  border-radius: 8px;
+  padding: 0.6rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 /* Game Event Dialog Styles */
 .game-event-dialog-overlay {
   position: fixed;

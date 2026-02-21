@@ -95,26 +95,14 @@ export default function GameEventDialog() {
                 Start Date:
                 <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required />
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <label className="dialog-label-flex">
                 Start Time:
-                <span style={{ position: 'relative', display: 'inline-block' }}>
-                  <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required style={{ paddingRight: '2rem' }} />
+                <span className="input-x-wrapper">
+                  <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required />
                   {form.startTime && (
                     <button
                       type="button"
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        background: 'none',
-                        border: 'none',
-                        color: 'red',
-                        fontSize: '1.2rem',
-                        cursor: 'pointer',
-                        padding: 0,
-                        zIndex: 2
-                      }}
+                      className="input-x-reset"
                       onClick={() => handleChange({
                         target: { name: 'startTime', value: '' }
                       } as React.ChangeEvent<HTMLInputElement>)}
@@ -125,26 +113,14 @@ export default function GameEventDialog() {
                   )}
                 </span>
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <label className="dialog-label-flex">
                 End Time:
-                <span style={{ position: 'relative', display: 'inline-block' }}>
-                  <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required style={{ paddingRight: '2rem' }} />
+                <span className="input-x-wrapper">
+                  <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required />
                   {form.endTime && (
                     <button
                       type="button"
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        background: 'none',
-                        border: 'none',
-                        color: 'red',
-                        fontSize: '1.2rem',
-                        cursor: 'pointer',
-                        padding: 0,
-                        zIndex: 2
-                      }}
+                      className="input-x-reset"
                       onClick={() => handleChange({
                         target: { name: 'endTime', value: '' }
                       } as React.ChangeEvent<HTMLInputElement>)}
@@ -168,7 +144,7 @@ export default function GameEventDialog() {
                 <button type="button" onClick={handleClose}>Cancel</button>
                 <button
                   type="button"
-                  style={{ background: 'none', border: '1px solid #00b4ff', color: '#00b4ff', borderRadius: '8px', padding: '0.6rem 1.25rem', fontWeight: 600, cursor: 'pointer' }}
+                  className="dialog-reset-btn"
                   onClick={() => setForm({ game: '', startDate: '', startTime: '', endTime: '', minPlayers: '', maxPlayers: '' })}
                 >
                   Reset
