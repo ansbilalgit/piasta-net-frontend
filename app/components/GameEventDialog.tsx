@@ -2,23 +2,25 @@
 import React, { useState, useEffect } from "react";
 import { fetchItems } from "../../lib/itemsService";
 
+import type { Item } from "../../lib/types";
+
 export default function GameEventDialog() {
   const [open, setOpen] = useState(false);
-  const [games, setGames] = useState<{ id: number; name: string }[]>([]);
+  const [games, setGames] = useState<Item[]>([]);
   const [form, setForm] = useState({
     game: "",
     startDate: "",
     startTime: "",
     endTime: "",
-    minPlayers: 2,
-    maxPlayers: 8,
+    minPlayers: "",
+    maxPlayers: "",
   });
 
   useEffect(() => {
     async function loadGames() {
       try {
         const items = await fetchItems();
-        setGames(items.map(({ id, name }) => ({ id, name })));
+        setGames(items);
       } catch (err) {
         setGames([]);
       }
@@ -27,7 +29,39 @@ export default function GameEventDialog() {
   }, [open, games.length]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    let updatedForm = { ...form, [name]: value };
+
+    // Auto-set min/max players based on game
+    if (name === "game" && value) {
+      const item = games.find(g => g.name === value);
+      if (item) {
+        // Fallbacks: minPlayers = 2, maxPlayers = 8 TODO: Use item.minPlayers and item.maxPlayers When they become available from another branch.
+        updatedForm.minPlayers = item.copies && item.copies > 0 ? item.copies : 2;
+        updatedForm.maxPlayers = item.copies && item.copies > 0 ? item.copies : 8;
+      }
+    }
+
+    // If game and startTime are set, and endTime is empty, set endTime = startTime + game duration
+    // Auto-set endTime if game and startTime are set, but endTime is empty
+    if (
+      ((name === "startTime" && updatedForm.game) || (name === "game" && updatedForm.startTime)) &&
+      updatedForm.game && updatedForm.startTime && !updatedForm.endTime
+    ) {
+      const item = games.find(g => g.name === updatedForm.game);
+      const duration = item && typeof item.length === "number" ? item.length : 60;
+      const [h, m] = updatedForm.startTime.split(":");
+      let startDate = new Date();
+      startDate.setHours(parseInt(h, 10));
+      startDate.setMinutes(parseInt(m, 10));
+      startDate.setSeconds(0);
+      let endDate = new Date(startDate.getTime() + duration * 60000);
+      const endTime = endDate
+        .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
+        .padStart(5, "0");
+      updatedForm.endTime = endTime;
+    }
+    setForm(updatedForm);
   };
 
   const handleOpen = () => setOpen(true);
@@ -61,13 +95,65 @@ export default function GameEventDialog() {
                 Start Date:
                 <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required />
               </label>
-              <label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 Start Time:
-                <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required />
+                <span style={{ position: 'relative', display: 'inline-block' }}>
+                  <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required style={{ paddingRight: '2rem' }} />
+                  {form.startTime && (
+                    <button
+                      type="button"
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'red',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        padding: 0,
+                        zIndex: 2
+                      }}
+                      onClick={() => handleChange({
+                        target: { name: 'startTime', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset start time"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
               </label>
-              <label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 End Time:
-                <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required />
+                <span style={{ position: 'relative', display: 'inline-block' }}>
+                  <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required style={{ paddingRight: '2rem' }} />
+                  {form.endTime && (
+                    <button
+                      type="button"
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'red',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        padding: 0,
+                        zIndex: 2
+                      }}
+                      onClick={() => handleChange({
+                        target: { name: 'endTime', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset end time"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
               </label>
               <label>
                 Min Players:
@@ -80,6 +166,13 @@ export default function GameEventDialog() {
               <div className="dialog-actions">
                 <button type="submit" className="btn-cta">Submit</button>
                 <button type="button" onClick={handleClose}>Cancel</button>
+                <button
+                  type="button"
+                  style={{ background: 'none', border: '1px solid #00b4ff', color: '#00b4ff', borderRadius: '8px', padding: '0.6rem 1.25rem', fontWeight: 600, cursor: 'pointer' }}
+                  onClick={() => setForm({ game: '', startDate: '', startTime: '', endTime: '', minPlayers: '', maxPlayers: '' })}
+                >
+                  Reset
+                </button>
               </div>
             </form>
           </div>
