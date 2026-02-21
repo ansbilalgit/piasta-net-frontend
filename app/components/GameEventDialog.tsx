@@ -98,7 +98,14 @@ export default function GameEventDialog() {
               </label>
               <label>
                 Start Date:
-                <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required />
+                <input
+                  type="date"
+                  name="startDate"
+                  value={form.startDate}
+                  onChange={handleChange}
+                  required
+                  min={new Date().toISOString().split("T")[0]}
+                />
               </label>
               <label className="dialog-label-flex">
                 Start Time:
@@ -139,7 +146,7 @@ export default function GameEventDialog() {
               <label className="dialog-label-flex">
                 Min Players:
                 <span className="input-x-wrapper">
-                  <input type="number" name="minPlayers" min={2} max={form.maxPlayers} value={form.minPlayers} onChange={handleChange} required />
+                  <input type="number" name="minPlayers" min={1} max={form.maxPlayers} value={form.minPlayers} onChange={handleChange} required />
                   {form.minPlayers && (
                     <button
                       type="button"
@@ -157,7 +164,7 @@ export default function GameEventDialog() {
               <label className="dialog-label-flex">
                 Max Players:
                 <span className="input-x-wrapper">
-                  <input type="number" name="maxPlayers" min={form.minPlayers} max={20} value={form.maxPlayers} onChange={handleChange} required />
+                  <input type="number" name="maxPlayers" min={form.minPlayers || 1} max={20} value={form.maxPlayers} onChange={handleChange} required />
                   {form.maxPlayers && (
                     <button
                       type="button"
