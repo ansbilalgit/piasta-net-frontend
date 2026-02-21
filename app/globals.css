@@ -1,3 +1,9 @@
+/* Center the Create Game Event button */
+.create-game-event-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
 @import "tailwindcss";
 
 :root {
@@ -257,12 +263,19 @@ html, body {
   margin-bottom: 1.5rem;
 }
 
+
 .next-card {
-  width: 560px;
   background: rgba(255, 255, 255, 0.02);
   padding: 1.25rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.next-card-wide {
+  width: 80vw;
+  max-width: 80vw;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 
