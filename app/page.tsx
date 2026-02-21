@@ -1,3 +1,4 @@
+import GameEventDialog from "./components/GameEventDialog";
 export default function HomePage() {
   return (
     <div className="site-container">
@@ -10,9 +11,7 @@ export default function HomePage() {
 
       <section className="next-game">
         <h3>Next Game Night — Every Tuesday</h3>
-        <div className="create-game-event-container">
-          <button className="btn-cta">Create Game Event</button>
-        </div>
+        <GameEventDialog />
       </section>
       <div className="next-card next-card-wide">
         {/* Innehåll läggs till senare */}
