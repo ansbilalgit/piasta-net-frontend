@@ -36,9 +36,14 @@ export default function GameEventDialog() {
     if (name === "game" && value) {
       const item = games.find(g => g.name === value);
       if (item) {
-        // Fallbacks: minPlayers = 2, maxPlayers = 8 TODO: Use item.minPlayers and item.maxPlayers When they become available from another branch.
-        updatedForm.minPlayers = item.copies && item.copies > 0 ? item.copies : 2;
-        updatedForm.maxPlayers = item.copies && item.copies > 0 ? item.copies : 8;
+        // Only set minPlayers if not already set
+        if (!updatedForm.minPlayers) {
+          updatedForm.minPlayers = item.copies && item.copies > 0 ? item.copies : 2;
+        }
+        // Only set maxPlayers if not already set
+        if (!updatedForm.maxPlayers) {
+          updatedForm.maxPlayers = item.copies && item.copies > 0 ? item.copies : 8;
+        }
       }
     }
 
@@ -131,13 +136,41 @@ export default function GameEventDialog() {
                   )}
                 </span>
               </label>
-              <label>
+              <label className="dialog-label-flex">
                 Min Players:
-                <input type="number" name="minPlayers" min={2} max={form.maxPlayers} value={form.minPlayers} onChange={handleChange} required />
+                <span className="input-x-wrapper">
+                  <input type="number" name="minPlayers" min={2} max={form.maxPlayers} value={form.minPlayers} onChange={handleChange} required />
+                  {form.minPlayers && (
+                    <button
+                      type="button"
+                      className="input-x-reset"
+                      onClick={() => handleChange({
+                        target: { name: 'minPlayers', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset min players"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
               </label>
-              <label>
+              <label className="dialog-label-flex">
                 Max Players:
-                <input type="number" name="maxPlayers" min={form.minPlayers} max={20} value={form.maxPlayers} onChange={handleChange} required />
+                <span className="input-x-wrapper">
+                  <input type="number" name="maxPlayers" min={form.minPlayers} max={20} value={form.maxPlayers} onChange={handleChange} required />
+                  {form.maxPlayers && (
+                    <button
+                      type="button"
+                      className="input-x-reset"
+                      onClick={() => handleChange({
+                        target: { name: 'maxPlayers', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset max players"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
               </label>
               <div className="dialog-actions">
                 <button type="submit" className="btn-cta">Submit</button>

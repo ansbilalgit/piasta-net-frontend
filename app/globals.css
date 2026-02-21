@@ -1,3 +1,9 @@
+.input-x-wrapper input[type="number"] {
+  width: 5.5rem;
+  min-width: 5.5rem;
+  max-width: 7rem;
+  text-align: right;
+}
 .input-x-wrapper input[type="time"] {
   padding-right: 2rem;
 }
