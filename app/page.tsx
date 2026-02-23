@@ -14,8 +14,14 @@ export default function HomePage() {
         <h3>Next Game Night — Every Tuesday</h3>
         <div className="next-card">
           <ParticipantCounter />
+        </div>  
+        <div className="create-game-event-container">
+          <button className="btn-cta">Create Game Event</button>
         </div>
       </section>
+      <div className="next-card next-card-wide">
+        {/* Innehåll läggs till senare */}
+      </div>
     </div>
   );
 }
