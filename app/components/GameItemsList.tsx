@@ -189,6 +189,7 @@ export default function GameItemsList({
               category={getTypeCategoryLabel(item)}
               description={item.description}
               players={`${item.minPlayers}–${item.maxPlayers}`}
+              thumbnail={item.thumbnail ?? ""}
               duration={`${item.length} min`}
             />
           ))}

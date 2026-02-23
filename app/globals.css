@@ -1,15 +1,14 @@
+/* Center the Create Game Event button */
+.create-game-event-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,21 +18,28 @@
   }
 }
 
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 .header {
+  width: 100%;
   background-color: #0b111f; /* header - bgcolor */
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.5rem;
   margin-top: 0px;
   border-top: 1px solid #21262d; /* header - border top size & color */
   border-bottom: 1px solid #21262d; /* header - border bottom size & color */
+  box-sizing: border-box;
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   gap: 1.5rem;
+  align-items: center;
 }
 .header-links {
   display: flex;
@@ -41,6 +47,8 @@
   gap: 1rem;
   flex: 1;
   font-size: 0.75rem;
+  flex-wrap: wrap;
+  align-content: center;
 }
 
 .header-left {
@@ -50,14 +58,16 @@
   gap: 0.75rem;
   font-size: 1rem;
   font-weight: 700;
+  white-space: nowrap;
+  grid-column: 1;
 }
 
 .header-right {
   color: #88337c; /* header - color element far right */
-  margin-left: auto;        /* Pushes the elements far right */
   display: flex;
   align-items: center;
   white-space: nowrap;
+  grid-column: 3;
 }
 
 .login-btn {
@@ -127,19 +137,33 @@
   text-align: right;
 }
 
+html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: scroll;
+}
+
 body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
 
 .footer {
+  width: 100%;
   background-color: #080c16; /* bg color */
   color: #69869d; /* footer - text left color */
-  padding: 2rem 1rem;
+  padding: 2rem 1.5rem;
   margin-top: 0rem;
   border-top: 1px solid #21262d; /* footer - top border color */
+  box-sizing: border-box;
 }
 
 .footer-content {
@@ -167,12 +191,6 @@ body {
   text-align: right;
 }
 
-/* ...existing code... */
-html, body {
-  height: 100%;
-  background-color:#080c16; /* bg color */
-}
-
 .layout-wrapper {
   display: flex;
   flex-direction: column;
@@ -186,12 +204,12 @@ html, body {
 }
 
 .site-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2.5rem 1rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -257,12 +275,21 @@ html, body {
   margin-bottom: 1.5rem;
 }
 
+
 .next-card {
   width: 560px;
+  max-width: 100%;
   background: rgba(255, 255, 255, 0.02);
   padding: 1.25rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.next-card-wide {
+  width: 80vw;
+  max-width: 80vw;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 
@@ -294,6 +321,8 @@ html, body {
 }
 
 .games-count {
+  display: flex;
+  justify-content: flex-start;
   color: #9fb6c8;
   margin: 0;
   font-size: 0.95rem;
@@ -332,6 +361,33 @@ html, body {
   .next-card {
     width: 100%;
   }
+  
+  /* Header adjustments for tablets/small screens */
+  .header-content {
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+  }
+  .header-left {
+    order: unset;
+    grid-column: 1;
+  }
+  .header-links {
+    order: unset;
+    width: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .header-right {
+    order: unset;
+    grid-column: 3;
+    margin-left: 0;
+  }
+  
+  /* Footer adjustments for tablets/small screens */
+  .footer-content {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 @media (max-width: 600px) {
@@ -340,5 +396,72 @@ html, body {
   }
   .games-grid {
     grid-template-columns: 1fr;
+  }
+  
+  /* Header adjustments for mobile */
+  .header {
+    padding: 0.75rem 1rem;
+  }
+  .header-content {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0.75rem;
+  }
+  .header-left {
+    font-size: 0.9rem;
+    width: auto;
+    order: unset;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .header-icon {
+    font-size: 1.5rem;
+  }
+  .header-links {
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    width: auto;
+    order: unset;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
+  }
+  .header-right {
+    width: auto;
+    order: unset;
+    grid-column: 3;
+    grid-row: 1;
+    margin-left: 0;
+  }
+  .nav-link {
+    padding: 0.35rem 0.5rem;
+  }
+  .login-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Footer adjustments for smaller screens/mobile */
+  .footer {
+    padding: 1.5rem 1rem;
+  }
+  .footer-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .footer-credit {
+    font-size: 0.75rem;
+    text-align: left;
+    max-width: 50%;
+    line-height: 1.4;
+  }
+  
+  /* Site container adjustments for smaller screens/mobile */
+  .site-container {
+    padding: 1.5rem 1rem;
   }
 }
