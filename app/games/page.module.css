@@ -18,3 +18,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 600px) {
+  .gamesPage {
+    padding: 1rem;
+  }
+  .pageWrap {
+    gap: 1rem;
+    padding: 0;
+  }
+}
