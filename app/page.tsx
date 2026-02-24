@@ -10,16 +10,16 @@ export default function HomePage() {
         <p className="hero-sub">Your gateway to epic gaming sessions at GU</p>
         <a href="/games" className="btn-cta">Browse Games →</a>
       </section>
-      
-      <section className="event-counter-section">
-        <EventCounter icon="🧑‍🤝‍🧑" label="Games Seeking Players" count={5} />
-      </section>
 
       <section className="next-game">
         <h3>Next Game Night — Every Tuesday</h3>
         <div className="next-card">
           <ParticipantCounter />
         </div>
+      </section>
+
+      <section className="event-counter-section">
+        <EventCounter icon="🧑‍🤝‍🧑" label="Games Seeking Players" count={5} />
       </section>
     </div>
   );
