@@ -1,6 +1,10 @@
-import { Serializer } from "v8"
+"use client";
+
+import { usePathname } from "next/navigation";
 
 export function Header() {
+  const pathname = usePathname();
+
   return (
     <header className="header">
         <div className="header-content">
@@ -10,8 +14,8 @@ export function Header() {
             </div>
 
         <nav className="header-links">
-            <a href="/" className="nav-link">Home</a>
-            <a href="/games" className="nav-link">Game Library</a>
+            <a href="/" className={`nav-link ${pathname === "/" ? "is-active" : ""}`}>Home</a>
+            <a href="/games" className={`nav-link ${pathname?.startsWith("/games") ? "is-active" : ""}`}>Game Library</a>
         </nav>
         <div className="header-right">
             <a href="/login" className="login-btn">
