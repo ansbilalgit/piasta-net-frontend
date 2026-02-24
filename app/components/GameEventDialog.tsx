@@ -1,9 +1,127 @@
+      <div className="create-game-event-container">
+        <button className="btn-cta" onClick={handleOpen}>Create Game Event</button>
+      </div>
+      {open && (
+        <div className="game-event-dialog-overlay">
+          <div className="game-event-dialog">
+            <h2>Create Game Event</h2>
+            <form onSubmit={handleSubmit}>
+              {/* ...existing form fields... */}
+              <label>
+                Game:
+                <select name="game" value={form.game} onChange={handleChange} required>
+                  <option value="">Select a game</option>
+                  {games.map((g) => (
+                    <option key={g.id} value={g.name}>{g.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Start Date:
+                <input
+                  type="date"
+                  name="startDate"
+                  value={form.startDate}
+                  onChange={handleChange}
+                  required
+                  min={new Date().toISOString().split("T")[0]}
+                />
+              </label>
+              <label className="dialog-label-flex">
+                Start Time:
+                <span className="input-x-wrapper">
+                  <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required />
+                  {form.startTime && (
+                    <button
+                      type="button"
+                      className="input-x-reset"
+                      onClick={() => handleChange({
+                        target: { name: 'startTime', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset start time"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              </label>
+              <label className="dialog-label-flex">
+                End Time:
+                <span className="input-x-wrapper">
+                  <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required />
+                  {form.endTime && (
+                    <button
+                      type="button"
+                      className="input-x-reset"
+                      onClick={() => handleChange({
+                        target: { name: 'endTime', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset end time"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              </label>
+              <label className="dialog-label-flex">
+                Min Players:
+                <span className="input-x-wrapper">
+                  <input type="number" name="minPlayers" min={1} max={20} value={form.minPlayers} onChange={handleChange} required />
+                  {form.minPlayers && (
+                    <button
+                      type="button"
+                      className="input-x-reset"
+                      onClick={() => handleChange({
+                        target: { name: 'minPlayers', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset min players"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              </label>
+              <label className="dialog-label-flex">
+                Max Players:
+                <span className="input-x-wrapper">
+                  <input type="number" name="maxPlayers" min={form.minPlayers || 1} max={20} value={form.maxPlayers} onChange={handleChange} required />
+                  {form.maxPlayers && (
+                    <button
+                      type="button"
+                      className="input-x-reset"
+                      onClick={() => handleChange({
+                        target: { name: 'maxPlayers', value: '' }
+                      } as React.ChangeEvent<HTMLInputElement>)}
+                      aria-label="Reset max players"
+                    >
+                      ×
+                    </button>
+                  )}
+                </span>
+              </label>
+              <div className="dialog-actions">
+                <button type="submit" className="btn-cta">Submit</button>
+                <button type="button" onClick={handleClose}>Cancel</button>
+                <button
+                  type="button"
+                  className="dialog-reset-btn"
+                  onClick={() => setForm({ game: '', startDate: '', startTime: '', endTime: '', minPlayers: '', maxPlayers: '' })}
+                >
+                  Reset
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 "use client";
 import React, { useState, useEffect } from "react";
 import { fetchItems } from "../../lib/itemsService";
 import { createGameEvent } from "../../lib/gameEventsService";
+import { fetchGameEvents } from "../../lib/gameEventsService";
 
 import type { Item } from "../../lib/types";
+import type { components } from "../../openapi/types";
 
 export default function GameEventDialog() {
   const [open, setOpen] = useState(false);
@@ -16,6 +134,7 @@ export default function GameEventDialog() {
     minPlayers: "",
     maxPlayers: "",
   });
+  const [gameEvents, setGameEvents] = useState<components["schemas"]["CreateGameEventDto"][]>([]);
 
   useEffect(() => {
     async function loadGames() {
@@ -26,8 +145,17 @@ export default function GameEventDialog() {
         setGames([]);
       }
     }
-    if (open && games.length === 0) loadGames();
-  }, [open, games.length]);
+    async function loadGameEvents() {
+      try {
+        const events = await fetchGameEvents();
+        setGameEvents(events);
+      } catch (err) {
+        setGameEvents([]);
+      }
+    }
+    loadGames();
+    loadGameEvents();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -105,119 +233,16 @@ export default function GameEventDialog() {
       maxNumberOfPlayers: Number(form.maxPlayers),
       ownerUserId: "John Doe",
     };
-    console.log("[GameEventDialog] Payload to be sent:", payload);
-    try {
-      await createGameEvent(payload);
-      console.log("[GameEventDialog] POST request sent successfully");
-      handleClose();
-    } catch (err) {
-      console.error("[GameEventDialog] Failed to create game event", err);
-      alert("Failed to create game event");
-    }
-  };
+    // ...existing code...
 
   return (
     <>
-      <div className="create-game-event-container">
-        <button className="btn-cta" onClick={handleOpen}>Create Game Event</button>
-      </div>
-      {open && (
-        <div className="game-event-dialog-overlay">
-          <div className="game-event-dialog">
-            <h2>Create Game Event</h2>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Game:
-                <select name="game" value={form.game} onChange={handleChange} required>
-                  <option value="">Select a game</option>
-                  {games.map((g) => (
-                    <option key={g.id} value={g.name}>{g.name}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Start Date:
-                <input
-                  type="date"
-                  name="startDate"
-                  value={form.startDate}
-                  onChange={handleChange}
-                  required
-                  min={new Date().toISOString().split("T")[0]}
-                />
-              </label>
-              <label className="dialog-label-flex">
-                Start Time:
-                <span className="input-x-wrapper">
-                  <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required />
-                  {form.startTime && (
-                    <button
-                      type="button"
-                      className="input-x-reset"
-                      onClick={() => handleChange({
-                        target: { name: 'startTime', value: '' }
-                      } as React.ChangeEvent<HTMLInputElement>)}
-                      aria-label="Reset start time"
-                    >
-                      ×
-                    </button>
-                  )}
-                </span>
-              </label>
-              <label className="dialog-label-flex">
-                End Time:
-                <span className="input-x-wrapper">
-                  <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required />
-                  {form.endTime && (
-                    <button
-                      type="button"
-                      className="input-x-reset"
-                      onClick={() => handleChange({
-                        target: { name: 'endTime', value: '' }
-                      } as React.ChangeEvent<HTMLInputElement>)}
-                      aria-label="Reset end time"
-                    >
-                      ×
-                    </button>
-                  )}
-                </span>
-              </label>
-              <label className="dialog-label-flex">
-                Min Players:
-                <span className="input-x-wrapper">
-                  <input type="number" name="minPlayers" min={1} max={form.maxPlayers} value={form.minPlayers} onChange={handleChange} required />
-                  {form.minPlayers && (
-                    <button
-                      type="button"
-                      className="input-x-reset"
-                      onClick={() => handleChange({
-                        target: { name: 'minPlayers', value: '' }
-                      } as React.ChangeEvent<HTMLInputElement>)}
-                      aria-label="Reset min players"
-                    >
-                      ×
-                    </button>
-                  )}
-                </span>
-              </label>
-              <label className="dialog-label-flex">
-                Max Players:
-                <span className="input-x-wrapper">
-                  <input type="number" name="maxPlayers" min={form.minPlayers || 1} max={20} value={form.maxPlayers} onChange={handleChange} required />
-                  {form.maxPlayers && (
-                    <button
-                      type="button"
-                      className="input-x-reset"
-                      onClick={() => handleChange({
-                        target: { name: 'maxPlayers', value: '' }
-                      } as React.ChangeEvent<HTMLInputElement>)}
-                      aria-label="Reset max players"
-                    >
-                      ×
-                    </button>
-                  )}
-                </span>
-              </label>
+      {/* Removed Create Game Event button and container */}
+      {/* Always visible event listing in rounded rectangle */}
+      <div className="game-events-list" style={{ marginTop: '2rem', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <h4>Existing Game Events</h4>
+        {gameEvents.length > 0 ? (
+          {/* Removed Create Game Event dialog functionality */}
               <div className="dialog-actions">
                 <button type="submit" className="btn-cta">Submit</button>
                 <button type="button" onClick={handleClose}>Cancel</button>
@@ -235,4 +260,5 @@ export default function GameEventDialog() {
       )}
     </>
   );
+}
 }

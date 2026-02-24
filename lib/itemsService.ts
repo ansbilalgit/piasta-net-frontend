@@ -1,6 +1,13 @@
-import { Item, ItemsResponse } from "./types";
+import type { components } from "../openapi/types";
+
+// Replace Item and ItemsResponse with types from openapi/types.ts if desired:
+// type Item = components["schemas"]["ItemBaseCreateDto"];
+// type ItemsResponse = { page: number; pageSize: number; totalCount: number; items: Item[] };
 
 const ITEMS_API_BASE_URL = "/api/items";
+
+// See openapi/swagger-link.txt for the current OpenAPI (Swagger) definition for the Items API
+// Types can be generated automatically from the spec
 
 export async function fetchItems(
   search?: string,

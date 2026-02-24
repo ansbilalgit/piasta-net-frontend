@@ -7,6 +7,8 @@ export interface Item {
   type: number;
   copies: number;
   categories: string[];
+  minPlayers: number;
+  maxPlayers: number;
 }
 
 export interface ItemsResponse {
