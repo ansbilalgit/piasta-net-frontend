@@ -123,12 +123,13 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
 
   return (
     <>
-      <button className="btn-cta" style={{ marginBottom: '1rem' }} onClick={() => setOpen(true)}>Custom Button</button>
+      <button className="btn-cta" style={{ marginBottom: '1rem' }} onClick={() => setOpen(true)}>Create Game Event</button>
       {open && (
         <div className="game-event-dialog-overlay">
           <div className="game-event-dialog">
             <h2>Create Game Event</h2>
             <form onSubmit={handleSubmit}>
+              {/* ...existing code... */}
               <label>
                 Game:
                 <select name="game" value={form.game} onChange={handleChange} required>
@@ -138,6 +139,7 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
                   ))}
                 </select>
               </label>
+              {/* ...existing code... */}
               <label>
                 Start Date:
                 <input
@@ -160,6 +162,7 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
                   required
                 />
               </label>
+              {/* ...existing code... */}
               <label>
                 Start Time:
                 <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required />
@@ -168,6 +171,7 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
                 End Time:
                 <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required />
               </label>
+              {/* ...existing code... */}
               <label>
                 Min Players:
                 <input type="number" name="minPlayers" min={1} max={20} value={form.minPlayers} onChange={handleChange} required />
@@ -187,31 +191,33 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
       <div className="next-card next-card-wide">
         <h4>Existing Game Events</h4>
         {gameEvents.length > 0 ? (
-          gameEvents.slice(0, 5).map((event, idx) => {
-            const game = games.find(g => g.id === event.gameId);
-            const gameName = game ? game.name : `Game #${event.gameId}`;
-            // Use event.gameId as the identifier for deletion
-            return (
-              <div key={idx} style={{ borderRadius: '12px', background: '#333', padding: '1rem', marginBottom: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{gameName}</div>
-                <div>Start: {event.startTime}</div>
-                <div>End: {event.endTime}</div>
-                <div>Min Players: {event.minNumberOfPlayers}</div>
-                <div>Max Players: {event.maxNumberOfPlayers}</div>
-                {event.ownerUserId && <div>Owner: {event.ownerUserId}</div>}
-                <button
-                  style={{ marginTop: '0.75rem', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer' }}
-                  onClick={async () => {
-                    const ok = await deleteGameEvent(event.gameId ?? '', event.ownerUserId ?? undefined);
-                    if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
-                    else alert('Failed to delete event');
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            );
-          })
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+            {gameEvents.slice(0, 5).map((event, idx) => {
+              const game = games.find(g => g.id === event.gameId);
+              const gameName = game ? game.name : `Game #${event.gameId}`;
+              // Use event.gameId as the identifier for deletion
+              return (
+                <div key={idx} style={{ flex: '1 1 300px', minWidth: '260px', maxWidth: '350px', borderRadius: '12px', background: '#333', padding: '1rem', marginBottom: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{gameName}</div>
+                  <div>Start: {event.startTime}</div>
+                  <div>End: {event.endTime}</div>
+                  <div>Min Players: {event.minNumberOfPlayers}</div>
+                  <div>Max Players: {event.maxNumberOfPlayers}</div>
+                  {event.ownerUserId && <div>Owner: {event.ownerUserId}</div>}
+                  <button
+                    style={{ marginTop: '0.75rem', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer' }}
+                    onClick={async () => {
+                      const ok = await deleteGameEvent(event.gameId ?? '', event.ownerUserId ?? undefined);
+                      if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
+                      else alert('Failed to delete event');
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <div>No events found</div>
         )}
