@@ -195,7 +195,7 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
             {gameEvents.slice(0, 5).map((event, idx) => {
               const game = games.find(g => g.id === event.gameId);
               const gameName = game ? game.name : `Game #${event.gameId}`;
-              // Use event.gameId as the identifier for deletion
+              // Use event.id (GUID) as the identifier for deletion
               return (
                 <div key={idx} style={{ flex: '1 1 300px', minWidth: '260px', maxWidth: '350px', borderRadius: '12px', background: '#333', padding: '1rem', marginBottom: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
                   <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{gameName}</div>
@@ -207,7 +207,7 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
                   <button
                     style={{ marginTop: '0.75rem', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer' }}
                     onClick={async () => {
-                      const ok = await deleteGameEvent(event.gameId ?? '', event.ownerUserId ?? undefined);
+                      const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
                       if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
                       else alert('Failed to delete event');
                     }}
