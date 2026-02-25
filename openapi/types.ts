@@ -280,6 +280,8 @@ export interface components {
     };
     CreateGameEventDto: {
       /** Format: int32 */
+      id?: number;
+      /** Format: int32 */
       gameId?: number;
       /** Format: date-time */
       startTime?: string;
