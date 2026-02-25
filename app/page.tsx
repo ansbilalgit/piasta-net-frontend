@@ -1,5 +1,6 @@
 import { ParticipantCounter } from "./components/ParticipantsCard";
 import { EventCounter } from "./components/EventCounter";
+import { SmilePlus, Sparkles } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -18,8 +19,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="event-counter-section">
-        <EventCounter icon="🧑‍🤝‍🧑" label="Games Seeking Players" count={5} />
+      <section className="seeking-players-section">
+        <EventCounter icon={<SmilePlus size={16} strokeWidth={2} />}
+        label="Games Seeking Players" 
+        count={5} />
+        <div className="seeking-players-field" />
       </section>
     </div>
   );

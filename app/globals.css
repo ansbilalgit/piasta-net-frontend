@@ -121,7 +121,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
@@ -147,13 +147,24 @@
   border: 1px solid rgba(13, 162, 231, 0.35);
 }
 
-.event-counter-section {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.seeking-players-section {
   width: 100%;
   max-width: 1200px;
-  margin: 4.5rem auto 1.5rem;
+  margin: 4.5rem auto 0;
+}
+
+.seeking-players-section .event-counter {
+  justify-content: flex-start;
+}
+
+.seeking-players-field {
+  margin-top: 0.9rem;
+  width: 100%;
+  min-width: 1400px;
+  min-height: 26rem;
+  border-radius: 0.75rem;
+  border: 1px solid #1f2937;
+  background-color: #0a0f18;
 }
 
 .header-top {
@@ -251,7 +262,7 @@ body {
 .site-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 2.5rem 2rem;
+  padding: 2.5rem 1.5rem;
     flex: 1;
     display: flex;
     flex-direction: column;
