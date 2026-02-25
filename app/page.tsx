@@ -21,6 +21,8 @@ async function deleteGameEvent(eventId: number | string, ownerUserId?: string) {
 import GameEventDialog from "./components/GameEventDialog";
 import GameEvents from "./components/GameEvents";
 import { useEffect, useState } from "react";
+import { ParticipantCounter } from "./components/ParticipantsCard";
+
 export default function HomePage() {
   const [gameEvents, setGameEvents] = useState<components["schemas"]["CreateGameEventDto"][]>([]);
   const [games, setGames] = useState<Item[]>([]);
@@ -57,6 +59,12 @@ export default function HomePage() {
 
       <section className="next-game">
         <h3>Next Game Night — Every Tuesday</h3>
+        <div className="next-card">
+          <ParticipantCounter />
+        </div>  
+        <div className="create-game-event-container">
+          <button className="btn-cta">Create Game Event</button>
+        </div>
       </section>
       <GameEvents
         gameEvents={gameEvents}

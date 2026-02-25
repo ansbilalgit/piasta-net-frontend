@@ -42,6 +42,7 @@ export async function fetchItems(
 
     const data: ItemsResponse = await response.json();
     totalCount = data.totalCount;
+    // Patch each item with minPlayers/maxPlayers
     allItems.push(...data.items);
 
     if (data.items.length === 0 || allItems.length >= totalCount) {
