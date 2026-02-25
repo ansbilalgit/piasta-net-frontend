@@ -46,3 +46,30 @@ Troubleshooting (cmd)
   ```
   npm cache clean --force
   ```
+
+---
+
+## Updating the API Spec & Generating Types
+
+The backend API is defined by an OpenAPI (Swagger) spec. To keep your frontend in sync:
+
+1. **Update the API spec:**
+   - The current spec URL is stored in `openapi/swagger-link.txt`.
+   - To fetch the latest spec, run:
+     ```
+     node update-openapi.js
+     ```
+   - This downloads the spec to `openapi/swagger.json`.
+
+2. **Generate TypeScript types:**
+   - Install the generator (if not already):
+     ```
+     npm install openapi-typescript --save-dev
+     ```
+   - Generate types from the spec:
+     ```
+     npx openapi-typescript openapi/swagger.json --output openapi/types.ts
+     ```
+   - Use these types in your code for API requests and responses.
+
+See comments in service files for more info.
