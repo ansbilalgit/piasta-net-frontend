@@ -62,9 +62,6 @@ export default function HomePage() {
         <div className="next-card">
           <ParticipantCounter />
         </div>  
-        <div className="create-game-event-container">
-          <button className="btn-cta">Create Game Event</button>
-        </div>
       </section>
       <GameEvents
         gameEvents={gameEvents}
