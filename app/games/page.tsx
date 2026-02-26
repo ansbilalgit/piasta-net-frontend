@@ -26,7 +26,7 @@ export default function GamesPage() {
         let minPlayersVal = Infinity;
         let maxPlayersVal = -Infinity;
         data.forEach((item) => {
-          item.categories.forEach((cat) => {
+          item.categories.forEach((cat: string) => {
             counts[cat] = (counts[cat] || 0) + 1;
           });
           // Assume default values if missing

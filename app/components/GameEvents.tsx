@@ -192,7 +192,7 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
         <h4>Existing Game Events</h4>
         {gameEvents.length > 0 ? (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            {gameEvents.slice(0, 5).map((event, idx) => {
+            {gameEvents.map((event, idx) => {
               const game = games.find(g => g.id === event.gameId);
               const gameName = game ? game.name : `Game #${event.gameId}`;
               // Use event.id (GUID) as the identifier for deletion
