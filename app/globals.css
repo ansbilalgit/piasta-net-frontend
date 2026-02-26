@@ -1,107 +1,3 @@
-.input-x-wrapper input[type="number"] {
-  width: 5.5rem;
-  min-width: 5.5rem;
-  max-width: 7rem;
-  text-align: right;
-}
-.input-x-wrapper input[type="time"] {
-  padding-right: 2rem;
-}
-.input-x-reset {
-  position: absolute;
-  right: 0.25rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #ff3333;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 0;
-  z-index: 2;
-  line-height: 1;
-}
-/* Game Event Dialog custom field styles */
-.dialog-label-flex {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.input-x-wrapper {
-  position: relative;
-  display: inline-block;
-}
-.dialog-reset-btn {
-  background: none;
-  border: 1px solid #00b4ff;
-  color: #00b4ff;
-  border-radius: 8px;
-  padding: 0.6rem 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-/* Game Event Dialog Styles */
-.game-event-dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.game-event-dialog {
-  background: #23262e;
-  padding: 2rem 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  min-width: 320px;
-  max-width: 90vw;
-  color: #fff;
-  border: 2px solid #00b4ff;
-}
-.game-event-dialog label {
-  color: #fff;
-}
-.game-event-dialog input,
-.game-event-dialog select {
-  background: #fff;
-  color: #23262e;
-  border: 1px solid #00b4ff;
-}
-.game-event-dialog h2 {
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-}
-.game-event-dialog label {
-  display: block;
-  margin-bottom: 0.75rem;
-}
-.game-event-dialog input,
-.game-event-dialog select {
-  margin-left: 0.5rem;
-  margin-top: 0.25rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  border: 1px solid #2a2d34;
-  background: #23262e;
-  color: #ededed;
-  font-size: 1rem;
-}
-.dialog-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-/* Center the Create Game Event button */
-.create-game-event-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
 @import "tailwindcss";
 
 :root {
@@ -258,6 +154,13 @@
   margin: 4.5rem auto 0;
 }
 
+.seeking-players-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .seeking-players-container {
   width: 100%;
   padding: 0 1.5rem 2.5rem;
@@ -270,10 +173,73 @@
 .seeking-players-field {
   margin-top: 0.9rem;
   width: 100%;
-  min-height: 26rem;
+  min-height: 0;
+  padding: 1.25rem;
   border-radius: 0.75rem;
   border: 1px solid #1f2937;
   background-color: #0a0f18;
+}
+
+.btn-cta.game-events-create-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem;
+  line-height: 1.1;
+}
+
+.btn-cta.game-events-create-btn .game-events-create-icon {
+  display: block;
+  transform: none;
+  flex-shrink: 0;
+}
+
+.game-events-panel {
+  width: 100%;
+}
+
+.game-events-panel h4 {
+  margin: 0 0 0.9rem;
+  color: #9fb6c8;
+  font-size: 0.85rem;
+}
+
+.game-events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.game-event-card {
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.18);
+  padding: 0.7rem;
+  font-size: 0.72rem;
+  color: #e5ecf5;
+}
+
+.game-event-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.game-event-delete-btn {
+  margin-top: 0.55rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: #dc2626;
+  color: #fff;
+  padding: 0.28rem 0.55rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.game-events-empty {
+  color: #9fb6c8;
+  font-size: 0.85rem;
 }
 
 .header-top {
@@ -440,7 +406,6 @@ body {
   margin-bottom: 1.5rem;
 }
 
-
 .next-card {
   width: 560px;
   max-width: 100%;
@@ -448,13 +413,6 @@ body {
   padding: 1.25rem;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.next-card-wide {
-  width: 80vw;
-  max-width: 80vw;
-  margin: 0 auto;
-  box-sizing: border-box;
 }
 
 
@@ -517,6 +475,10 @@ body {
 
 /* Responsiveness */
 @media (max-width: 900px) {
+  .game-events-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .games-layout {
     grid-template-columns: 1fr;
   }
@@ -556,6 +518,15 @@ body {
 }
 
 @media (max-width: 600px) {
+  .seeking-players-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .game-events-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hero-title {
     font-size: 2rem;
   }

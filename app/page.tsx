@@ -1,55 +1,7 @@
-"use client";
-import { fetchGameEvents } from "../lib/gameEventsService";
-import { fetchItems } from "../lib/itemsService";
-import type { Item } from "../lib/types";
-import type { components } from "../openapi/types";
-// Delete endpoint
-async function deleteGameEvent(eventId: number | string, ownerUserId?: string) {
-  try {
-    const url = `https://piasta-net-app.azurewebsites.net/api/GameEvents/${eventId}` + (ownerUserId ? `?ownerUserId=${encodeURIComponent(ownerUserId)}` : '');
-    console.log('[GameEventCard] DELETE:', url);
-    const res = await fetch(url, {
-      method: 'DELETE',
-    });
-    console.log('[GameEventCard] DELETE response:', res.status, res.statusText);
-    return res.ok;
-  } catch (err) {
-    console.error('[GameEventCard] DELETE error:', err);
-    return false;
-  }
-}
-import GameEventDialog from "./components/GameEventDialog";
-import GameEvents from "./components/GameEvents";
-import { useEffect, useState } from "react";
 import { ParticipantCounter } from "./components/ParticipantsCard";
-import { EventCounter } from "./components/EventCounter";
-import { SmilePlus, Sparkles } from "lucide-react";
+import { SeekingPlayersPanel } from "./components/SeekingPlayersPanel";
 
 export default function HomePage() {
-  const [gameEvents, setGameEvents] = useState<components["schemas"]["CreateGameEventDto"][]>([]);
-  const [games, setGames] = useState<Item[]>([]);
-
-  useEffect(() => {
-    async function loadGameEvents() {
-      try {
-        const events = await fetchGameEvents();
-        setGameEvents(events);
-      } catch (err) {
-        setGameEvents([]);
-      }
-    }
-    async function loadGames() {
-      try {
-        const items = await fetchItems();
-        setGames(items);
-      } catch (err) {
-        setGames([]);
-      }
-    }
-    loadGameEvents();
-    loadGames();
-  }, []);
-
   return (
     <>
       <div className="site-container">
@@ -69,24 +21,7 @@ export default function HomePage() {
       </div>
 
       <div className="seeking-players-container">
-        <section className="seeking-players-section">
-          <EventCounter
-          icon={<SmilePlus size={16} strokeWidth={2} />}
-          label="Games Seeking Players"
-          count={gameEvents.filter(event => {
-            if (!event.startTime) return false;
-            const start = new Date(event.startTime);
-            return start > new Date();
-          }).length}
-          />
-          <div className="seeking-players-field" />
-        </section>
-        <GameEvents
-        gameEvents={gameEvents}
-        games={games}
-        setGameEvents={setGameEvents}
-        deleteGameEvent={deleteGameEvent}
-      />
+        <SeekingPlayersPanel />
       </div>
     </>
   );
