@@ -1,6 +1,7 @@
 "use client";
 import type { Item } from "../../lib/types";
 import type { components } from "../../openapi/types";
+import { Plus } from 'lucide-react';
 
 interface GameEventsProps {
   gameEvents: components["schemas"]["CreateGameEventDto"][];
@@ -134,7 +135,8 @@ export default function GameEvents({
     <>
       {showCreateButton && (
         <button className="btn-cta game-events-create-btn" onClick={() => setOpen(true)}>
-          Create Game Event
+          <Plus className="h-5 w-5 game-events-create-icon" />
+          <span>Create Game Event</span>
         </button>
       )}
       {open && (
@@ -201,77 +203,78 @@ export default function GameEvents({
           </div>
         </div>
       )}
-      <div className="next-card next-card-wide">
-        <h4>Existing Game Events</h4>
-        {gameEvents.length > 0 ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            {gameEvents.map((event, idx) => {
-              const game = games.find(g => g.id === event.gameId);
-              const gameName = game ? game.name : `Game #${event.gameId}`;
-              // Use event.id (GUID) as the identifier for deletion
-              return (
-                <div key={idx} className="flex-[1_1_300px] min-w-[280px] max-w-[360px] rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
-                  {/* Card Header */}
-                  <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
-                    <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
-                  </div>
-                  
-                  {/* Card Body */}
-                  <div className="p-5 space-y-3">
-                    {/* Time Row */}
-                    <div className="flex items-center gap-3 text-sm">
-                      <span className="w-5 h-5 flex items-center justify-center text-cyan-400">🕐</span>
-                      <span className="text-slate-400 font-medium">Start</span>
-                      <span className="ml-auto text-slate-200 font-semibold">{event.startTime ? new Date(event.startTime).toLocaleString() : 'N/A'}</span>
+      {showList && (
+        <>
+          {gameEvents.length > 0 ? (
+            <div className="game-events-grid">
+              {gameEvents.map((event, idx) => {
+                const game = games.find(g => g.id === event.gameId);
+                const gameName = game ? game.name : `Game #${event.gameId}`;
+                // Use event.id (GUID) as the identifier for deletion
+                return (
+                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
+                    {/* Card Header */}
+                    <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
+                      <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
                     </div>
                     
-                    <div className="flex items-center gap-3 text-sm">
-                      <span className="w-5 h-5 flex items-center justify-center text-purple-400">🏁</span>
-                      <span className="text-slate-400 font-medium">End</span>
-                      <span className="ml-auto text-slate-200 font-semibold">{event.endTime ? new Date(event.endTime).toLocaleString() : 'N/A'}</span>
-                    </div>
-                    
-                    {/* Divider */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent my-3"></div>
-                    
-                    {/* Players Row */}
-                    <div className="flex items-center gap-3 text-sm">
-                      <span className="w-5 h-5 flex items-center justify-center text-emerald-400">👥</span>
-                      <span className="text-slate-400 font-medium">Players</span>
-                      <span className="ml-auto text-slate-200 font-semibold">{event.minNumberOfPlayers} - {event.maxNumberOfPlayers}</span>
-                    </div>
-                    
-                    {/* Owner Row (if exists) */}
-                    {event.ownerUserId && (
+                    {/* Card Body */}
+                    <div className="p-5 space-y-3">
+                      {/* Time Row */}
                       <div className="flex items-center gap-3 text-sm">
-                        <span className="w-5 h-5 flex items-center justify-center text-amber-400">👤</span>
-                        <span className="text-slate-400 font-medium">Host</span>
-                        <span className="ml-auto text-slate-200 font-semibold truncate max-w-[150px]">{event.ownerUserId}</span>
+                        <span className="w-5 h-5 flex items-center justify-center text-cyan-400">🕐</span>
+                        <span className="text-slate-400 font-medium">Start</span>
+                        <span className="ml-auto text-slate-200 font-semibold">{event.startTime ? new Date(event.startTime).toLocaleString() : 'N/A'}</span>
                       </div>
-                    )}
+                      
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="w-5 h-5 flex items-center justify-center text-purple-400">🏁</span>
+                        <span className="text-slate-400 font-medium">End</span>
+                        <span className="ml-auto text-slate-200 font-semibold">{event.endTime ? new Date(event.endTime).toLocaleString() : 'N/A'}</span>
+                      </div>
+                      
+                      {/* Divider */}
+                      <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent my-3"></div>
+                      
+                      {/* Players Row */}
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="w-5 h-5 flex items-center justify-center text-emerald-400">👥</span>
+                        <span className="text-slate-400 font-medium">Players</span>
+                        <span className="ml-auto text-slate-200 font-semibold">{event.minNumberOfPlayers} - {event.maxNumberOfPlayers}</span>
+                      </div>
+                      
+                      {/* Owner Row (if exists) */}
+                      {event.ownerUserId && (
+                        <div className="flex items-center gap-3 text-sm">
+                          <span className="w-5 h-5 flex items-center justify-center text-amber-400">👤</span>
+                          <span className="text-slate-400 font-medium">Host</span>
+                          <span className="ml-auto text-slate-200 font-semibold truncate max-w-[150px]">{event.ownerUserId}</span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Card Footer */}
+                    <div className="px-5 pb-5 flex justify-end">
+                      <button
+                        className="bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500/50 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
+                        onClick={async () => {
+                          const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
+                          if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
+                          else alert('Failed to delete event');
+                        }}
+                      >
+                        <span>🗑️</span> Delete
+                      </button>
+                    </div>
                   </div>
-                  
-                  {/* Card Footer */}
-                  <div className="px-5 pb-5 flex justify-end">
-                    <button
-                      className="bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500/50 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
-                      onClick={async () => {
-                        const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
-                        if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
-                        else alert('Failed to delete event');
-                      }}
-                    >
-                      <span>🗑️</span> Delete
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div>No events found</div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div>No events found</div>
+          )}
+        </>
+      )}
     </>
   );
 }

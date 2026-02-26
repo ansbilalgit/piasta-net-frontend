@@ -180,7 +180,18 @@
   background-color: #0a0f18;
 }
 
-.game-events-create-btn {
+.btn-cta.game-events-create-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.45rem;
+  line-height: 1.1;
+}
+
+.btn-cta.game-events-create-btn .game-events-create-icon {
+  display: block;
+  transform: none;
   flex-shrink: 0;
 }
 
