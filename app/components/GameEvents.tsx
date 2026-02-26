@@ -7,11 +7,20 @@ interface GameEventsProps {
   games: Item[];
   setGameEvents: React.Dispatch<React.SetStateAction<components["schemas"]["CreateGameEventDto"][]>>;
   deleteGameEvent: (eventId: number | string, ownerUserId?: string) => Promise<boolean>;
+  showCreateButton?: boolean;
+  showList?: boolean;
 }
 
 import { useState } from "react";
 
-export default function GameEvents({ gameEvents, games, setGameEvents, deleteGameEvent }: GameEventsProps) {
+export default function GameEvents({
+  gameEvents,
+  games,
+  setGameEvents,
+  deleteGameEvent,
+  showCreateButton = true,
+  showList = true,
+}: GameEventsProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     game: "",
@@ -123,7 +132,11 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
 
   return (
     <>
-      <button className="btn-cta" style={{ marginBottom: '1rem' }} onClick={() => setOpen(true)}>Create Game Event</button>
+      {showCreateButton && (
+        <button className="btn-cta game-events-create-btn" onClick={() => setOpen(true)}>
+          Create Game Event
+        </button>
+      )}
       {open && (
         <div className="game-event-dialog-overlay">
           <div className="game-event-dialog">
@@ -188,40 +201,41 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
           </div>
         </div>
       )}
-      <div className="next-card next-card-wide">
-        <h4>Existing Game Events</h4>
-        {gameEvents.length > 0 ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-            {gameEvents.map((event, idx) => {
-              const game = games.find(g => g.id === event.gameId);
-              const gameName = game ? game.name : `Game #${event.gameId}`;
-              // Use event.id (GUID) as the identifier for deletion
-              return (
-                <div key={idx} style={{ flex: '1 1 300px', minWidth: '260px', maxWidth: '350px', borderRadius: '12px', background: '#333', padding: '1rem', marginBottom: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{gameName}</div>
-                  <div>Start: {event.startTime}</div>
-                  <div>End: {event.endTime}</div>
-                  <div>Min Players: {event.minNumberOfPlayers}</div>
-                  <div>Max Players: {event.maxNumberOfPlayers}</div>
-                  {event.ownerUserId && <div>Owner: {event.ownerUserId}</div>}
-                  <button
-                    style={{ marginTop: '0.75rem', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer' }}
-                    onClick={async () => {
-                      const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
-                      if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
-                      else alert('Failed to delete event');
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div>No events found</div>
-        )}
-      </div>
+      {showList && (
+        <div className="game-events-panel">
+          <h4>Existing Game Events</h4>
+          {gameEvents.length > 0 ? (
+            <div className="game-events-grid">
+              {gameEvents.map((event, idx) => {
+                const game = games.find(g => g.id === event.gameId);
+                const gameName = game ? game.name : `Game #${event.gameId}`;
+                return (
+                  <div key={idx} className="game-event-card">
+                    <div className="game-event-title">{gameName}</div>
+                    <div>Start: {event.startTime}</div>
+                    <div>End: {event.endTime}</div>
+                    <div>Min Players: {event.minNumberOfPlayers}</div>
+                    <div>Max Players: {event.maxNumberOfPlayers}</div>
+                    {event.ownerUserId && <div>Owner: {event.ownerUserId}</div>}
+                    <button
+                      className="game-event-delete-btn"
+                      onClick={async () => {
+                        const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
+                        if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
+                        else alert('Failed to delete event');
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="game-events-empty">No events found</div>
+          )}
+        </div>
+      )}
     </>
   );
 }
