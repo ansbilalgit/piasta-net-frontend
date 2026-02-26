@@ -81,6 +81,12 @@ export default function HomePage() {
           />
           <div className="seeking-players-field" />
         </section>
+        <GameEvents
+        gameEvents={gameEvents}
+        games={games}
+        setGameEvents={setGameEvents}
+        deleteGameEvent={deleteGameEvent}
+      />
       </div>
     </>
   );
