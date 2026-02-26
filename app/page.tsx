@@ -22,6 +22,8 @@ import GameEventDialog from "./components/GameEventDialog";
 import GameEvents from "./components/GameEvents";
 import { useEffect, useState } from "react";
 import { ParticipantCounter } from "./components/ParticipantsCard";
+import { EventCounter } from "./components/EventCounter";
+import { SmilePlus, Sparkles } from "lucide-react";
 
 export default function HomePage() {
   const [gameEvents, setGameEvents] = useState<components["schemas"]["CreateGameEventDto"][]>([]);
@@ -49,26 +51,43 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="site-container">
-      <section className="hero">
-        <div className="kicker">Game Design &amp; Technology</div>
-        <h1 className="hero-title">Game Night Hub</h1>
-        <p className="hero-sub">Your gateway to epic gaming sessions at GU</p>
-        <a href="/games" className="btn-cta">Browse Games →</a>
-      </section>
+    <>
+      <div className="site-container">
+        <section className="hero">
+          <div className="kicker">Game Design &amp; Technology</div>
+          <h1 className="hero-title">Game Night Hub</h1>
+          <p className="hero-sub">Your gateway to epic gaming sessions at GU</p>
+          <a href="/games" className="btn-cta">Browse Games →</a>
+        </section>
 
-      <section className="next-game">
-        <h3>Next Game Night — Every Tuesday</h3>
-        <div className="next-card">
-          <ParticipantCounter />
-        </div>  
-      </section>
-      <GameEvents
+        <section className="next-game">
+          <h3>Next Game Night — Every Tuesday</h3>
+          <div className="next-card">
+            <ParticipantCounter />
+          </div>
+        </section>
+      </div>
+
+      <div className="seeking-players-container">
+        <section className="seeking-players-section">
+          <EventCounter
+          icon={<SmilePlus size={16} strokeWidth={2} />}
+          label="Games Seeking Players"
+          count={gameEvents.filter(event => {
+            if (!event.startTime) return false;
+            const start = new Date(event.startTime);
+            return start > new Date();
+          }).length}
+          />
+          <div className="seeking-players-field" />
+        </section>
+        <GameEvents
         gameEvents={gameEvents}
         games={games}
         setGameEvents={setGameEvents}
         deleteGameEvent={deleteGameEvent}
       />
-    </div>
+      </div>
+    </>
   );
 }
