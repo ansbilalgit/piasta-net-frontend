@@ -197,23 +197,60 @@ export default function GameEvents({ gameEvents, games, setGameEvents, deleteGam
               const gameName = game ? game.name : `Game #${event.gameId}`;
               // Use event.id (GUID) as the identifier for deletion
               return (
-                <div key={idx} style={{ flex: '1 1 300px', minWidth: '260px', maxWidth: '350px', borderRadius: '12px', background: '#333', padding: '1rem', marginBottom: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '0.5rem' }}>{gameName}</div>
-                  <div>Start: {event.startTime}</div>
-                  <div>End: {event.endTime}</div>
-                  <div>Min Players: {event.minNumberOfPlayers}</div>
-                  <div>Max Players: {event.maxNumberOfPlayers}</div>
-                  {event.ownerUserId && <div>Owner: {event.ownerUserId}</div>}
-                  <button
-                    style={{ marginTop: '0.75rem', background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1rem', cursor: 'pointer' }}
-                    onClick={async () => {
-                      const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
-                      if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
-                      else alert('Failed to delete event');
-                    }}
-                  >
-                    Delete
-                  </button>
+                <div key={idx} className="flex-[1_1_300px] min-w-[280px] max-w-[360px] rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
+                  {/* Card Header */}
+                  <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
+                    <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
+                  </div>
+                  
+                  {/* Card Body */}
+                  <div className="p-5 space-y-3">
+                    {/* Time Row */}
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="w-5 h-5 flex items-center justify-center text-cyan-400">🕐</span>
+                      <span className="text-slate-400 font-medium">Start</span>
+                      <span className="ml-auto text-slate-200 font-semibold">{event.startTime ? new Date(event.startTime).toLocaleString() : 'N/A'}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="w-5 h-5 flex items-center justify-center text-purple-400">🏁</span>
+                      <span className="text-slate-400 font-medium">End</span>
+                      <span className="ml-auto text-slate-200 font-semibold">{event.endTime ? new Date(event.endTime).toLocaleString() : 'N/A'}</span>
+                    </div>
+                    
+                    {/* Divider */}
+                    <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent my-3"></div>
+                    
+                    {/* Players Row */}
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="w-5 h-5 flex items-center justify-center text-emerald-400">👥</span>
+                      <span className="text-slate-400 font-medium">Players</span>
+                      <span className="ml-auto text-slate-200 font-semibold">{event.minNumberOfPlayers} - {event.maxNumberOfPlayers}</span>
+                    </div>
+                    
+                    {/* Owner Row (if exists) */}
+                    {event.ownerUserId && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="w-5 h-5 flex items-center justify-center text-amber-400">👤</span>
+                        <span className="text-slate-400 font-medium">Host</span>
+                        <span className="ml-auto text-slate-200 font-semibold truncate max-w-[150px]">{event.ownerUserId}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Card Footer */}
+                  <div className="px-5 pb-5 flex justify-end">
+                    <button
+                      className="bg-red-500/15 hover:bg-red-500/25 text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500/50 rounded-lg px-4 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-2"
+                      onClick={async () => {
+                        const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
+                        if (ok) setGameEvents(gameEvents.filter((_, i) => i !== idx));
+                        else alert('Failed to delete event');
+                      }}
+                    >
+                      <span>🗑️</span> Delete
+                    </button>
+                  </div>
                 </div>
               );
             })}
