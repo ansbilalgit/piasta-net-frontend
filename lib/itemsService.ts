@@ -5,7 +5,8 @@ import type { components } from "../openapi/types";
 // type ItemsResponse = { page: number; pageSize: number; totalCount: number; items: Item[] };
 
 const ITEMS_API_BASE_URL = "/api/items";
-
+import type { Item } from "@/lib/types";
+import type { ItemsResponse } from "@/lib/types";
 // See openapi/swagger-link.txt for the current OpenAPI (Swagger) definition for the Items API
 // Types can be generated automatically from the spec
 

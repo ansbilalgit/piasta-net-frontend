@@ -68,7 +68,7 @@ export default function GameItemsList({
       setError(null);
 
       try {
-        const data = await fetchItems(
+        const data : Item[] = await fetchItems(
           debouncedFilters.searchTerm || undefined,
           debouncedFilters.activeTab === "all" ? undefined : debouncedFilters.activeTab,
           debouncedFilters.activeSort,
