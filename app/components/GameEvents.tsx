@@ -2,7 +2,7 @@
 import type { Item } from "../../lib/types";
 import type { components } from "../../openapi/types";
 import { toast, Toaster } from "react-hot-toast";
-import { Plus } from 'lucide-react';
+import { Plus, UserPlus } from 'lucide-react'; // Added UserPlus icon
 import { useState, useEffect } from "react";
 
 interface GameEventsProps {
@@ -71,20 +71,21 @@ export default function GameEvents({
   });
 
   // Overlap protection logic
+  // Overlap protection logic
   const hasOverlap = (targetGameId: number, startStr: string, endStr: string, eventIdToIgnore?: string) => {
-    // Parse strings locally to avoid UTC conversion shifts
     const newStart = new Date(startStr).getTime();
     const newEnd = new Date(endStr).getTime();
 
     return gameEvents.some(event => {
-      if (eventIdToIgnore && event.id === eventIdToIgnore) return false;
+      // FIX: Wrap event.id in String() so TypeScript stops complaining about number vs string
+      if (eventIdToIgnore && String(event.id) === String(eventIdToIgnore)) return false;
+
       if (event.gameId !== targetGameId) return false;
       if (!event.startTime || !event.endTime) return false;
 
       const existingStart = new Date(event.startTime).getTime();
       const existingEnd = new Date(event.endTime).getTime();
 
-      // Event A starts before Event B ends, AND Event A ends after Event B starts
       return newStart < existingEnd && newEnd > existingStart;
     });
   };
@@ -159,7 +160,6 @@ export default function GameEvents({
     const startDateTime = `${form.startDate}T${form.startTime}`;
     const endDateTime = `${form.endDate || form.startDate}T${form.endTime}`;
 
-    // Run overlap check
     if (hasOverlap(game.id, startDateTime, endDateTime)) {
       toast.error(`"${game.name}" is already scheduled during this time.`);
       return;
@@ -167,7 +167,6 @@ export default function GameEvents({
 
     setIsProcessing(true);
 
-    // Explicitly set the time string without .toISOString() to prevent timezone shifting
     const payload = {
       gameId: game.id,
       startTime: `${startDateTime}:00`,
@@ -207,7 +206,6 @@ export default function GameEvents({
     const startDateTime = `${editForm.startDate}T${editForm.startTime}`;
     const endDateTime = `${editForm.endDate || editForm.startDate}T${editForm.endTime}`;
 
-    // Run overlap check, making sure to ignore the event we are currently editing
     if (hasOverlap(targetGameId, startDateTime, endDateTime, editingEvent.id)) {
       toast.error(`This game is already scheduled during this time.`);
       return;
@@ -215,7 +213,6 @@ export default function GameEvents({
 
     setIsProcessing(true);
 
-    // Explicitly set the time string without .toISOString() to prevent timezone shifting
     const payload = {
       gameEventId: editingEvent.id,
       gameId: targetGameId,
@@ -259,7 +256,6 @@ export default function GameEvents({
     setEditingEvent(event);
     const game = games.find(g => g.id === event.gameId);
 
-    // Extract exact strings directly to avoid Javascript Date object timezone interference
     setEditForm({
       game: game?.name || "",
       startDate: event.startTime ? event.startTime.substring(0, 10) : "",
@@ -605,14 +601,26 @@ export default function GameEvents({
                 const hasSlots = availableSlots(eventData) > 0;
 
                 return (
-                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
+                  // ADDED HOVER EFFECTS HERE
+                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_8px_20px_-6px_rgba(34,211,238,0.2)]">
 
                     {/* Card Header */}
                     <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
+
+                          {/* ADDED LOOKING FOR PLAYERS BADGE HERE */}
+                          {hasSlots && (
+                            <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded text-xs font-medium">
+                              <UserPlus size={14} className="animate-heartbeat text-amber-400" />
+                              Looking for Players
+                            </div>
+                          )}
+
+                        </div>
                         {isOwner && (
-                          <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">Host</span>
+                          <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full shrink-0">Host</span>
                         )}
                       </div>
                     </div>
