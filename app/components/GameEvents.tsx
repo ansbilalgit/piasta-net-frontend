@@ -542,10 +542,10 @@ export default function GameEvents({
 
       {/* Restored showList wrapper */}
       {showList && (
-        <div className="next-card next-card-wide">
+        <div className="game-events-panel">
           <h4>Existing Game Events</h4>
           {gameEvents.length > 0 ? (
-            <div className="game-events-grid" style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+            <div className="game-events-grid">
               {gameEvents.map((event, idx) => {
                 const game = games.find(g => g.id === event.gameId);
                 const gameName = game ? game.name : `Game #${event.gameId}`;
@@ -554,7 +554,9 @@ export default function GameEvents({
                 const hasSlots = availableSlots(eventData) > 0;
 
                 return (
-                  <div key={idx} className="flex-[1_1_300px] min-w-[280px] max-w-[360px] rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
+                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
+
+                    {/* Card Header */}
                     <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
@@ -564,6 +566,7 @@ export default function GameEvents({
                       </div>
                     </div>
 
+                    {/* Card Body */}
                     <div className="p-5 space-y-3">
                       <div className="flex items-center gap-3 text-sm">
                         <span className="w-5 h-5 flex items-center justify-center text-cyan-400">🕐</span>
@@ -604,6 +607,7 @@ export default function GameEvents({
                       )}
                     </div>
 
+                    {/* Card Footer */}
                     <div className="px-5 pb-5 flex flex-wrap gap-2">
                       <button
                         className={`flex-1 bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-500/25 hover:text-cyan-300 hover:border-cyan-500/50'}`}
