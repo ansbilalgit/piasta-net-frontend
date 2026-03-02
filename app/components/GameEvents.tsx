@@ -12,7 +12,7 @@ interface GameEventsProps {
   showList?: boolean;
 }
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function GameEvents({
   gameEvents,
@@ -131,16 +131,33 @@ export default function GameEvents({
     setForm({ game: "", startDate: "", startTime: "", endDate: "", endTime: "", minPlayers: "", maxPlayers: "" });
   };
 
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        handleCancel();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open]);
+
   return (
     <>
       {showCreateButton && (
-        <button className="btn-cta game-events-create-btn" onClick={() => setOpen(true)}>
+        <button type="button" className="btn-cta game-events-create-btn" onClick={() => setOpen(true)}>
           <Plus className="h-5 w-5 game-events-create-icon" />
           <span>Create Game Event</span>
         </button>
       )}
       {open && (
-        <div className="game-event-dialog-overlay">
+        <div className="game-event-dialog-overlay" onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            handleCancel();
+          }
+        }}>
           <div className="game-event-dialog">
             <h2>Create Game Event</h2>
             <form onSubmit={handleSubmit}>

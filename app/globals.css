@@ -241,6 +241,71 @@
   color: #9fb6c8;
   font-size: 0.85rem;
 }
+/* GAME EVENT DIALOG, GUI showing up when pressing button "Create Game Event" */
+.game-event-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.75);
+}
+
+.game-event-dialog {
+  width: min(100%, 560px);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #1f2937;
+  background: #0a0f18;
+  padding: 1.25rem;
+  color: #e5ecf5;
+}
+
+.game-event-dialog h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.game-event-dialog form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.game-event-dialog label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: #c9d8e6;
+}
+
+.game-event-dialog input,
+.game-event-dialog select {
+  border-radius: 0.5rem;
+  border: 1px solid #334155;
+  background: #0b111f;
+  color: #e5ecf5;
+  padding: 0.55rem 0.65rem;
+}
+
+.dialog-actions {
+  margin-top: 0.35rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.dialog-actions button:not(.btn-cta) {
+  border-radius: 0.5rem;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #c9d8e6;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
 
 .header-top {
   display: flex;
