@@ -2,8 +2,8 @@
 import type { Item } from "../../lib/types";
 import type { components } from "../../openapi/types";
 import { toast, Toaster } from "react-hot-toast";
-import { Plus } from 'lucide-react'; // Restored from main
-import { useState, useEffect } from "react"; // Added useEffect back
+import { Plus } from 'lucide-react';
+import { useState, useEffect } from "react";
 
 interface GameEventsProps {
   gameEvents: components["schemas"]["CreateGameEventDto"][];
@@ -17,6 +17,20 @@ interface GameEventsProps {
 type GameEvent = Omit<components["schemas"]["CreateGameEventDto"], "id"> & {
   id?: string;
   participants?: string[];
+};
+
+// Helper functions to prevent Javascript Timezone shifting bugs
+const getLocalYMD = (d: Date = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getLocalHM = (d: Date = new Date()) => {
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
 };
 
 export default function GameEvents({
@@ -56,44 +70,65 @@ export default function GameEvents({
     maxPlayers: "",
   });
 
+  // Overlap protection logic
+  const hasOverlap = (targetGameId: number, startStr: string, endStr: string, eventIdToIgnore?: string) => {
+    // Parse strings locally to avoid UTC conversion shifts
+    const newStart = new Date(startStr).getTime();
+    const newEnd = new Date(endStr).getTime();
+
+    return gameEvents.some(event => {
+      if (eventIdToIgnore && event.id === eventIdToIgnore) return false;
+      if (event.gameId !== targetGameId) return false;
+      if (!event.startTime || !event.endTime) return false;
+
+      const existingStart = new Date(event.startTime).getTime();
+      const existingEnd = new Date(event.endTime).getTime();
+
+      // Event A starts before Event B ends, AND Event A ends after Event B starts
+      return newStart < existingEnd && newEnd > existingStart;
+    });
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     let updatedForm = { ...form, [name]: value };
+
     if (!updatedForm.endDate && updatedForm.startDate) {
       updatedForm.endDate = updatedForm.startDate;
     }
+
     if ((name === "game" || name === "startTime") && updatedForm.game && updatedForm.startTime) {
       const item = games.find(g => g.name === updatedForm.game);
       if (item) {
         const duration = typeof item.length === "number" ? item.length : 60;
         const [h, m] = updatedForm.startTime.split(":");
-        let startDate = new Date(updatedForm.startDate || new Date());
+        let startDate = new Date(updatedForm.startDate || getLocalYMD());
         startDate.setHours(parseInt(h, 10));
         startDate.setMinutes(parseInt(m, 10));
         startDate.setSeconds(0);
+
         let endDate = new Date(startDate.getTime() + duration * 60000);
-        updatedForm.endDate = updatedForm.startDate || new Date().toISOString().split("T")[0];
-        updatedForm.endTime = endDate
-          .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
-          .padStart(5, "0");
+        updatedForm.endDate = updatedForm.startDate || getLocalYMD();
+        updatedForm.endTime = getLocalHM(endDate);
       }
     }
+
     if ((name === "game" || name === "endTime") && updatedForm.game && updatedForm.endTime) {
       const item = games.find(g => g.name === updatedForm.game);
       if (item) {
         const duration = typeof item.length === "number" ? item.length : 60;
         const [h, m] = updatedForm.endTime.split(":");
-        let endDate = new Date(updatedForm.endDate || new Date());
+        let endDate = new Date(updatedForm.endDate || getLocalYMD());
         endDate.setHours(parseInt(h, 10));
         endDate.setMinutes(parseInt(m, 10));
         endDate.setSeconds(0);
+
         let startDate = new Date(endDate.getTime() - duration * 60000);
-        updatedForm.startDate = updatedForm.endDate || new Date().toISOString().split("T")[0];
-        updatedForm.startTime = startDate
-          .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
-          .padStart(5, "0");
+        updatedForm.startDate = updatedForm.endDate || getLocalYMD();
+        updatedForm.startTime = getLocalHM(startDate);
       }
     }
+
     if (name === "game" && value) {
       const item = games.find(g => g.name === value);
       if (item) {
@@ -121,13 +156,22 @@ export default function GameEvents({
       return;
     }
 
-    setIsProcessing(true);
     const startDateTime = `${form.startDate}T${form.startTime}`;
     const endDateTime = `${form.endDate || form.startDate}T${form.endTime}`;
+
+    // Run overlap check
+    if (hasOverlap(game.id, startDateTime, endDateTime)) {
+      toast.error(`"${game.name}" is already scheduled during this time.`);
+      return;
+    }
+
+    setIsProcessing(true);
+
+    // Explicitly set the time string without .toISOString() to prevent timezone shifting
     const payload = {
       gameId: game.id,
-      startTime: new Date(startDateTime).toISOString(),
-      endTime: new Date(endDateTime).toISOString(),
+      startTime: `${startDateTime}:00`,
+      endTime: `${endDateTime}:00`,
       minNumberOfPlayers: Number(form.minPlayers),
       maxNumberOfPlayers: Number(form.maxPlayers),
       ownerUserId: currentUser,
@@ -156,16 +200,27 @@ export default function GameEvents({
     e.preventDefault();
     if (!editingEvent?.id) return;
 
-    setIsProcessing(true);
     const game = games.find(g => g.name === editForm.game);
+    const targetGameId = game?.id || editingEvent.gameId;
+    if (targetGameId === undefined) return;
+
     const startDateTime = `${editForm.startDate}T${editForm.startTime}`;
     const endDateTime = `${editForm.endDate || editForm.startDate}T${editForm.endTime}`;
 
+    // Run overlap check, making sure to ignore the event we are currently editing
+    if (hasOverlap(targetGameId, startDateTime, endDateTime, editingEvent.id)) {
+      toast.error(`This game is already scheduled during this time.`);
+      return;
+    }
+
+    setIsProcessing(true);
+
+    // Explicitly set the time string without .toISOString() to prevent timezone shifting
     const payload = {
       gameEventId: editingEvent.id,
-      gameId: game?.id || editingEvent.gameId,
-      startTime: new Date(startDateTime).toISOString(),
-      endTime: new Date(endDateTime).toISOString(),
+      gameId: targetGameId,
+      startTime: `${startDateTime}:00`,
+      endTime: `${endDateTime}:00`,
       minNumberOfPlayers: Number(editForm.minPlayers),
       maxNumberOfPlayers: Number(editForm.maxPlayers),
       ownerUserId: editingEvent.ownerUserId,
@@ -204,15 +259,13 @@ export default function GameEvents({
     setEditingEvent(event);
     const game = games.find(g => g.id === event.gameId);
 
-    const startDate = event.startTime ? new Date(event.startTime) : null;
-    const endDate = event.endTime ? new Date(event.endTime) : null;
-
+    // Extract exact strings directly to avoid Javascript Date object timezone interference
     setEditForm({
       game: game?.name || "",
-      startDate: startDate ? startDate.toISOString().split("T")[0] : "",
-      startTime: startDate ? startDate.toTimeString().slice(0, 5) : "",
-      endDate: endDate ? endDate.toISOString().split("T")[0] : "",
-      endTime: endDate ? endDate.toTimeString().slice(0, 5) : "",
+      startDate: event.startTime ? event.startTime.substring(0, 10) : "",
+      startTime: event.startTime ? event.startTime.substring(11, 16) : "",
+      endDate: event.endTime ? event.endTime.substring(0, 10) : "",
+      endTime: event.endTime ? event.endTime.substring(11, 16) : "",
       minPlayers: String(event.minNumberOfPlayers || ""),
       maxPlayers: String(event.maxNumberOfPlayers || ""),
     });
@@ -229,7 +282,6 @@ export default function GameEvents({
     setEditingEvent(null);
   };
 
-  // Restored Escape Key listener from main branch
   useEffect(() => {
     if (!open && !editOpen && !participantsOpen) return;
 
@@ -344,7 +396,6 @@ export default function GameEvents({
     <>
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#1e293b', color: '#fff' } }} />
 
-      {/* Restored showCreateButton wrapper */}
       {showCreateButton && (
         <button type="button" className="btn-cta game-events-create-btn" onClick={() => setOpen(true)} style={{ marginBottom: '1rem' }}>
           <Plus className="h-5 w-5 game-events-create-icon" />
@@ -371,11 +422,11 @@ export default function GameEvents({
               </label>
               <label>
                 Start Date:
-                <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required min={new Date().toISOString().split("T")[0]} />
+                <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required min={getLocalYMD()} />
               </label>
               <label>
                 End Date:
-                <input type="date" name="endDate" value={form.endDate} onChange={handleChange} min={form.startDate || new Date().toISOString().split("T")[0]} required />
+                <input type="date" name="endDate" value={form.endDate} onChange={handleChange} min={form.startDate || getLocalYMD()} required />
               </label>
               <label>
                 Start Time:
