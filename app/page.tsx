@@ -3,6 +3,7 @@ import { fetchGameEvents } from "../lib/gameEventsService";
 import { fetchItems } from "../lib/itemsService";
 import type { Item } from "../lib/types";
 import type { components } from "../openapi/types";
+import { Toaster } from "react-hot-toast";
 // Delete endpoint
 async function deleteGameEvent(eventId: number | string, ownerUserId?: string) {
   try {
@@ -52,6 +53,7 @@ export default function HomePage() {
 
   return (
     <>
+      <Toaster position="bottom-right" toastOptions={{ style: { background: '#1e293b', color: '#fff' } }} />
       <div className="site-container">
         <section className="hero">
           <div className="kicker">Game Design &amp; Technology</div>
