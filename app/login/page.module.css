@@ -1,0 +1,223 @@
+.loginPage {
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  width: min(100%, 520px);
+  margin: 1.5rem auto;
+  padding: 1.75rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 15, 24, 0.82);
+  backdrop-filter: blur(3px);
+}
+
+.modeToggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding: 0.35rem;
+  border-radius: 12px;
+  border: 1px solid rgba(13, 162, 231, 0.28);
+  background: rgba(13, 162, 231, 0.08);
+}
+
+.toggleButton {
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #9fb6c8;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.48rem 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.toggleButton[data-active="true"] {
+  color: #ffffff;
+  background: linear-gradient(90deg, #00b4ff, #9b4dff);
+  box-shadow: 0 8px 20px rgba(13, 162, 231, 0.28);
+}
+
+.toggleButton:hover {
+  color: #e5ecf5;
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid rgba(13, 162, 231, 0.5);
+  outline-offset: 2px;
+}
+
+.title {
+  margin: 0.35rem 0 0.6rem;
+  color: #e5ecf5;
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 0;
+  color: #9fb6c8;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+  color: #c9d8e6;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.field input {
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #0b111f;
+  color: #e5ecf5;
+  padding: 0.62rem 0.72rem;
+}
+
+.field input:focus {
+  outline: 2px solid rgba(13, 162, 231, 0.45);
+  outline-offset: 2px;
+  border-color: #0da2e7;
+}
+
+.gdprConsent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-top: 0.1rem;
+  color: #c9d8e6;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.gdprConsent input {
+  margin-top: 0.15rem;
+  accent-color: #0da2e7;
+}
+
+.moreInfoButton {
+  border: none;
+  background: transparent;
+  color: #0da2e7;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.88rem;
+}
+
+.moreInfoButton:hover {
+  color: #65c8f6;
+}
+
+.moreInfoButton:focus-visible {
+  outline: 2px solid rgba(13, 162, 231, 0.5);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.submitButton {
+  border: none;
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.actions {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.secondaryLink {
+  color: #9fb6c8;
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+
+.secondaryLink:hover {
+  color: #0da2e7;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.75);
+}
+
+.modalCard {
+  width: min(100%, 560px);
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+  background: #0a0f18;
+  padding: 1.15rem;
+}
+
+.modalTitle {
+  margin: 0 0 0.6rem;
+  color: #e5ecf5;
+  font-size: 1.18rem;
+}
+
+.modalText {
+  margin: 0.45rem 0;
+  color: #c9d8e6;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.modalActions {
+  margin-top: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modalCloseButton {
+  border-radius: 9px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #c9d8e6;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.modalCloseButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 1.2rem;
+    margin: 1rem auto;
+  }
+
+  .actions {
+    gap: 0.65rem;
+  }
+}
