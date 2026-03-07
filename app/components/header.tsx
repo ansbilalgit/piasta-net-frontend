@@ -30,6 +30,8 @@ export function Header() {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     setIsLoggedIn(false);
+    // Dispatch custom event to notify other components in the same tab
+    window.dispatchEvent(new Event("authChange"));
     toast.success("Logged out successfully");
     router.push("/");
   };

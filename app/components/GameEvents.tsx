@@ -2,8 +2,9 @@
 import type { Item } from "../../lib/types";
 import type { components } from "../../openapi/types";
 import { toast, Toaster } from "react-hot-toast";
-import { Plus, UserPlus } from 'lucide-react'; // Added UserPlus icon
-import { useState, useEffect } from "react";
+import { Plus, UserPlus, LogIn } from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 interface GameEventsProps {
   gameEvents: components["schemas"]["CreateGameEventDto"][];
@@ -41,12 +42,14 @@ export default function GameEvents({
   showCreateButton = true,
   showList = true,
 }: GameEventsProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<GameEvent | null>(null);
   const [participantsOpen, setParticipantsOpen] = useState(false);
   const [viewingEvent, setViewingEvent] = useState<GameEvent | null>(null);
-  const [currentUser] = useState("John Doe");
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [participantName, setParticipantName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -70,16 +73,34 @@ export default function GameEvents({
     maxPlayers: "",
   });
 
+  // Check login status and listen for auth changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
+      setIsLoggedIn(!!token);
+      setCurrentUser(username);
+    };
+
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    window.addEventListener("authChange", checkAuth);
+    window.addEventListener("focus", checkAuth);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("authChange", checkAuth);
+      window.removeEventListener("focus", checkAuth);
+    };
+  }, []);
+
   // Overlap protection logic
-  // Overlap protection logic
-  const hasOverlap = (targetGameId: number, startStr: string, endStr: string, eventIdToIgnore?: string) => {
+  const hasOverlap = useCallback((targetGameId: number, startStr: string, endStr: string, eventIdToIgnore?: string) => {
     const newStart = new Date(startStr).getTime();
     const newEnd = new Date(endStr).getTime();
 
     return gameEvents.some(event => {
-      // FIX: Wrap event.id in String() so TypeScript stops complaining about number vs string
       if (eventIdToIgnore && String(event.id) === String(eventIdToIgnore)) return false;
-
       if (event.gameId !== targetGameId) return false;
       if (!event.startTime || !event.endTime) return false;
 
@@ -88,7 +109,7 @@ export default function GameEvents({
 
       return newStart < existingEnd && newEnd > existingStart;
     });
-  };
+  }, [gameEvents]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -151,6 +172,12 @@ export default function GameEvents({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to create events");
+      return;
+    }
+
     const game = games.find(g => g.name === form.game);
     if (!game) {
       toast.error("Game not found");
@@ -184,7 +211,31 @@ export default function GameEvents({
       });
       if (!response.ok) throw new Error("Failed to create game event");
       const newEvent = await response.json();
-      setGameEvents(prev => [newEvent, ...prev]);
+      
+      // Add the creator as the first participant
+      const eventWithCreator = {
+        ...newEvent,
+        participants: [currentUser]
+      };
+      
+      // Also add the creator as a participant via the API
+      if (newEvent.id) {
+        try {
+          await fetch("https://piasta-net-app.azurewebsites.net/api/GameEvents/add-participant", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              gameEventID: newEvent.id,
+              participantUserID: currentUser,
+              requestingUserID: currentUser
+            }),
+          });
+        } catch (joinErr) {
+          console.error("[GameEvents] Failed to auto-join event:", joinErr);
+        }
+      }
+      
+      setGameEvents(prev => [eventWithCreator, ...prev]);
       setOpen(false);
       setForm({ game: "", startDate: "", startTime: "", endDate: "", endTime: "", minPlayers: "", maxPlayers: "" });
       toast.success("Game event created successfully!");
@@ -198,6 +249,17 @@ export default function GameEvents({
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingEvent?.id) return;
+    
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to edit events");
+      return;
+    }
+
+    // Only allow editing own events
+    if (editingEvent.ownerUserId !== currentUser) {
+      toast.error("You can only edit your own events");
+      return;
+    }
 
     const game = games.find(g => g.name === editForm.game);
     const targetGameId = game?.id || editingEvent.gameId;
@@ -253,6 +315,12 @@ export default function GameEvents({
   };
 
   const openEditDialog = (event: GameEvent) => {
+    // Only allow opening edit dialog for own events
+    if (!isLoggedIn || !currentUser || event.ownerUserId !== currentUser) {
+      toast.error("You can only edit your own events");
+      return;
+    }
+    
     setEditingEvent(event);
     const game = games.find(g => g.id === event.gameId);
 
@@ -294,6 +362,11 @@ export default function GameEvents({
   }, [open, editOpen, participantsOpen]);
 
   const addParticipant = async (eventId: string, userId: string) => {
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to join events");
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       const payload = {
@@ -335,6 +408,11 @@ export default function GameEvents({
   };
 
   const removeParticipant = async (eventId: string, userId: string) => {
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to leave events");
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       const payload = {
@@ -380,12 +458,35 @@ export default function GameEvents({
     setParticipantsOpen(true);
   };
 
-  const isEventOwner = (event: GameEvent) => event.ownerUserId === currentUser;
-  const isParticipant = (event: GameEvent) => event.participants?.includes(currentUser);
+  const isEventOwner = (event: GameEvent) => isLoggedIn && currentUser !== null && event.ownerUserId === currentUser;
+  const isParticipant = (event: GameEvent) => isLoggedIn && currentUser !== null && event.participants?.includes(currentUser);
   const availableSlots = (event: GameEvent) => {
     const max = event.maxNumberOfPlayers || 0;
     const current = event.participants?.length || 0;
     return max - current;
+  };
+
+  const handleDeleteEvent = async (event: GameEvent) => {
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to delete events");
+      return;
+    }
+
+    // Only allow deleting own events
+    if (event.ownerUserId !== currentUser) {
+      toast.error("You can only delete your own events");
+      return;
+    }
+
+    setIsProcessing(true);
+    const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
+    if (ok) {
+      setGameEvents(prev => prev.filter(ev => ev.id !== event.id));
+      toast.success('Event deleted successfully');
+    } else {
+      toast.error('Failed to delete event');
+    }
+    setIsProcessing(false);
   };
 
   return (
@@ -393,10 +494,17 @@ export default function GameEvents({
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#1e293b', color: '#fff' } }} />
 
       {showCreateButton && (
-        <button type="button" className="btn-cta game-events-create-btn" onClick={() => setOpen(true)} style={{ marginBottom: '1rem' }}>
-          <Plus className="h-5 w-5 game-events-create-icon" />
-          <span>Create Game Event</span>
-        </button>
+        isLoggedIn ? (
+          <button type="button" className="btn-cta game-events-create-btn" onClick={() => setOpen(true)} style={{ marginBottom: '1rem' }}>
+            <Plus className="h-5 w-5 game-events-create-icon" />
+            <span>Create Game Event</span>
+          </button>
+        ) : (
+          <button type="button" className="btn-cta game-events-create-btn" onClick={() => router.push("/login")} style={{ marginBottom: '1rem' }}>
+            <LogIn className="h-5 w-5 game-events-create-icon" />
+            <span>Login to Create Event</span>
+          </button>
+        )
       )}
 
       {/* Create Dialog */}
@@ -532,20 +640,28 @@ export default function GameEvents({
               </div>
 
               <div className="flex gap-3">
-                {!isParticipant(viewingEvent) && availableSlots(viewingEvent) > 0 && (
+                {!isParticipant(viewingEvent) && availableSlots(viewingEvent) > 0 && isLoggedIn && (
                   <button
                     className={`flex-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-lg px-4 py-2 font-semibold transition-colors ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-500/30'}`}
                     disabled={isProcessing}
-                    onClick={() => viewingEvent.id && addParticipant(viewingEvent.id, currentUser)}
+                    onClick={() => viewingEvent.id && currentUser && addParticipant(viewingEvent.id, currentUser)}
                   >
                     {isProcessing ? '⏳ Processing...' : '✋ Join Event'}
+                  </button>
+                )}
+                {!isLoggedIn && availableSlots(viewingEvent) > 0 && (
+                  <button
+                    className={`flex-1 bg-slate-500/20 text-slate-400 border border-slate-500/40 rounded-lg px-4 py-2 font-semibold transition-colors hover:bg-slate-500/30`}
+                    onClick={() => router.push("/login")}
+                  >
+                    Login to Join
                   </button>
                 )}
                 {isParticipant(viewingEvent) && !isEventOwner(viewingEvent) && (
                   <button
                     className={`flex-1 bg-orange-500/20 text-orange-400 border border-orange-500/40 rounded-lg px-4 py-2 font-semibold transition-colors ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-500/30'}`}
                     disabled={isProcessing}
-                    onClick={() => viewingEvent.id && removeParticipant(viewingEvent.id, currentUser)}
+                    onClick={() => viewingEvent.id && currentUser && removeParticipant(viewingEvent.id, currentUser)}
                   >
                     {isProcessing ? '⏳ Processing...' : '🚪 Leave Event'}
                   </button>
@@ -601,7 +717,6 @@ export default function GameEvents({
                 const hasSlots = availableSlots(eventData) > 0;
 
                 return (
-                  // ADDED HOVER EFFECTS HERE
                   <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_8px_20px_-6px_rgba(34,211,238,0.2)]">
 
                     {/* Card Header */}
@@ -610,7 +725,6 @@ export default function GameEvents({
                         <div>
                           <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
 
-                          {/* ADDED LOOKING FOR PLAYERS BADGE HERE */}
                           {hasSlots && (
                             <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded text-xs font-medium">
                               <UserPlus size={14} className="animate-heartbeat text-amber-400" />
@@ -681,10 +795,8 @@ export default function GameEvents({
                           className={`bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-500/25 hover:text-orange-300 hover:border-orange-500/50'}`}
                           disabled={isProcessing}
                           onClick={async () => {
-                            if (!eventData.id) return;
-                            if (confirm('Are you sure you want to leave this event?')) {
-                              await removeParticipant(eventData.id, currentUser);
-                            }
+                            if (!eventData.id || !currentUser) return;
+                            await removeParticipant(eventData.id, currentUser);
                           }}
                         >
                           <span>🚪</span> Leave
@@ -701,23 +813,15 @@ export default function GameEvents({
                         </button>
                       )}
 
-                      <button
-                        className={`bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500/25 hover:text-red-300 hover:border-red-500/50'}`}
-                        disabled={isProcessing}
-                        onClick={async () => {
-                          setIsProcessing(true);
-                          const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
-                          if (ok) {
-                            setGameEvents(prev => prev.filter(ev => ev.id !== event.id));
-                            toast.success('Event deleted successfully');
-                          } else {
-                            toast.error('Failed to delete event');
-                          }
-                          setIsProcessing(false);
-                        }}
-                      >
-                        <span>🗑️</span>
-                      </button>
+                      {isOwner && (
+                        <button
+                          className={`bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500/25 hover:text-red-300 hover:border-red-500/50'}`}
+                          disabled={isProcessing}
+                          onClick={() => handleDeleteEvent(eventData)}
+                        >
+                          <span>🗑️</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
