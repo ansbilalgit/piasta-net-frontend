@@ -239,11 +239,17 @@ export default function GameEventDialog() {
         <h4>Existing Game Events</h4>
         {gameEvents.length > 0 ? (
           <ul>
-            {gameEvents.map((event, idx) => (
-              <li key={idx}>
-                {event.gameId} - {event.startTime} to {event.endTime} ({event.minNumberOfPlayers}-{event.maxNumberOfPlayers} players)
-              </li>
-            ))}
+            {[...gameEvents]
+              .sort((a, b) => {
+                const aTime = a.startTime ? new Date(a.startTime).getTime() : 0;
+                const bTime = b.startTime ? new Date(b.startTime).getTime() : 0;
+                return aTime - bTime;
+              })
+              .map((event, idx) => (
+                <li key={idx}>
+                  {event.gameId} - {event.startTime} to {event.endTime} ({event.minNumberOfPlayers}-{event.maxNumberOfPlayers} players)
+                </li>
+              ))}
           </ul>
         ) : (
           <p>No game events found.</p>
