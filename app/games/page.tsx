@@ -110,7 +110,7 @@ export default function GamesPage() {
 
   return (
     <div className={styles.gamesPage}>
-      <div className="games-header">
+      <div className={`games-header ${styles.gamesHeader}`}>
         <div className="games-header-top">
           <span className="games-icon">🎮</span>
           <h1>Game Library</h1>

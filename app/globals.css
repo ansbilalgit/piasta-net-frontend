@@ -1,19 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #3636363c;
   --foreground: #171717;
   --content-max-width: 1200px;
   --seeking-max-width: 1200px;
+  --figures-offset-y: 15px;
+  --figures-offset-y-mobile: 2px;
+  --dialog-picker-icon-color: #8fd8ff;
+  --dialog-picker-icon-opacity: 1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #6da395af;
     --foreground: #ededed;
   }
 }
+/*for baby blue bg #08706d7b*/
+/*for purple bg #100145*/
+/*for white bg #e1dddd*/
+/*from the yellowish figures #c8bea8*/
 
+/*Best until now: #6da395af*/
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -116,9 +125,10 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #e4e2f0;
+  color: #000000;
 }
-
+/*#5c76ff*/
+/*#e4e2f0*/
 .event-counter-left {
   display: flex;
   align-items: center;
@@ -171,13 +181,25 @@
 }
 
 .seeking-players-field {
+  position: relative;
+  overflow: hidden;
   margin-top: 0.9rem;
   width: 100%;
   min-height: 0;
-  padding: 1.25rem;
-  border-radius: 0.75rem;
-  border: 1px solid #1f2937;
-  background-color: #0a0f18;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(96 165 250 / 0.4);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background: linear-gradient(135deg, hsla(199 89% 48% / 0.1) 0%, hsla(32 95% 55% / 0.1) 100%);
+  color: #e5ecf5;
+}
+
+@media (min-width: 768px) {
+  .seeking-players-field {
+    padding: 2rem;
+  }
 }
 
 .btn-cta.game-events-create-btn {
@@ -291,6 +313,27 @@
   padding: 0.55rem 0.65rem;
 }
 
+/* Manually control native date/time picker icon visibility inside the dialog */
+.game-event-dialog input[type="date"],
+.game-event-dialog input[type="time"] {
+  color-scheme: dark;
+}
+
+.game-event-dialog input[type="date"]::-webkit-calendar-picker-indicator,
+.game-event-dialog input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) saturate(100%) invert(89%) sepia(14%) saturate(1473%)
+    hue-rotate(167deg) brightness(101%) contrast(102%);
+  opacity: var(--dialog-picker-icon-opacity);
+  cursor: pointer;
+}
+
+/* Firefox icon tinting support */
+.game-event-dialog input[type="date"]::-moz-calendar-picker-indicator,
+.game-event-dialog input[type="time"]::-moz-calendar-picker-indicator {
+  color: var(--dialog-picker-icon-color);
+  opacity: var(--dialog-picker-icon-opacity);
+}
+
 .dialog-actions {
   margin-top: 0.35rem;
   display: flex;
@@ -346,7 +389,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
@@ -397,6 +440,10 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background-image: url("./Background/GeminiBackground4.png");
+  background-repeat: no-repeat;
+  background-position: center calc(100% + var(--figures-offset-y));
+  background-size: min(100%, 3280px) auto;
 }
 
 .site-container {
@@ -437,7 +484,7 @@ body {
 }
 
 .hero-sub {
-  color: #9fb6c8;
+  color: #ededed;
   margin-bottom: 1.25rem;
   font-size: 1rem;
 }
@@ -467,7 +514,7 @@ body {
 }
 
 .next-game h3 {
-  color: #9fb6c8;
+  color: #ededed;
   margin-bottom: 1.5rem;
 }
 
@@ -501,7 +548,11 @@ body {
   flex-direction: column;
   font-size: 2.5rem;
   margin: 0;
-  color: #ededed;
+  background: linear-gradient(90deg, #00b4ff, #9b4dff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .games-icon {
@@ -511,7 +562,7 @@ body {
 .games-count {
   display: flex;
   justify-content: flex-start;
-  color: #9fb6c8;
+  color: #ededed;
   margin: 0;
   font-size: 0.95rem;
 }
@@ -580,9 +631,19 @@ body {
     width: 100%;
     justify-content: space-between;
   }
+
+  .layout-content {
+    background-position: center calc(100% + var(--figures-offset-y-mobile));
+    background-size: 155% auto;
+  }
 }
 
 @media (max-width: 600px) {
+  .layout-content {
+    background-position: center calc(100% + var(--figures-offset-y-mobile));
+    background-size: 175% auto;
+  }
+
   .seeking-players-head {
     flex-direction: column;
     align-items: flex-start;
