@@ -3,6 +3,40 @@
   padding: 1.5rem 1rem 2rem;
 }
 
+.gamesHeader {
+  --banner-shrink-x: 18px;
+  --banner-right-inset: 8px;
+  position: relative;
+  padding: 0.45rem 0 0.7rem;
+  margin-bottom: 1rem;
+  min-height: clamp(168px, 22vw, 286px);
+  overflow: hidden;
+}
+
+.gamesHeader::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 1%;
+  height: 100%;
+  background-image: url("../Background/Banner-sheet2.png");
+  background-repeat: no-repeat;
+
+
+  background-size: calc(100% - var(--banner-shrink-x)) auto;
+  background-position: right var(--banner-right-inset) bottom;
+
+  pointer-events: none;
+} 
+
+.gamesHeader :global(.games-header-top),
+.gamesHeader :global(.games-count) {
+  position: relative;
+  z-index: 1;
+  max-width: min(100%, 560px);
+}
+
 .pageWrap {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -14,15 +48,71 @@
 }
 
 @media (max-width: 900px) {
+  .gamesHeader {
+    min-height: clamp(132px, 30vw, 216px);
+    margin-bottom: 0.9rem;
+  }
+
+  .gamesHeader :global(.games-header-top),
+  .gamesHeader :global(.games-count) {
+    max-width: min(100%, 62%);
+  }
+
   .pageWrap {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-top: 0;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .gamesPage {
     padding: 1rem;
   }
+
+  .gamesHeader {
+    --banner-top-offset: 60px;
+    --banner-bottom-gap: 4px;
+    --banner-shrink-x: 0px;
+    --banner-right-inset: 0px;
+    min-height: 176px;
+    margin-bottom: 0.75rem;
+    padding: 0.3rem 0 0.45rem;
+  }
+
+  .gamesHeader::after {
+    top: var(--banner-top-offset);
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(101%, 620px);
+    height: calc(100% - var(--banner-top-offset) - var(--banner-bottom-gap));
+    background-size: contain;
+    background-position: center bottom;
+  }
+
+  .gamesHeader :global(.games-header-top),
+  .gamesHeader :global(.games-count) {
+    max-width: 100%;
+  }
+
+  .gamesHeader :global(.games-header-top) {
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .gamesHeader :global(.games-header-top h1) {
+    display: block;
+    white-space: nowrap;
+    line-height: 1.05;
+    font-size: clamp(2rem, 9vw, 2.4rem);
+  }
+
+  .gamesHeader :global(.games-count) {
+    white-space: nowrap;
+    font-size: 0.95rem;
+  }
+
   .pageWrap {
     gap: 1rem;
     padding: 0;

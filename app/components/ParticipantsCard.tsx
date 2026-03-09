@@ -141,7 +141,7 @@ export function ParticipantCounter() {
 
         {/* Reset Timer */}
         {resetTime && (
-          <div className="text-xs text-slate-400 mb-4">
+          <div className="text-xs text-blue-200 mb-4">
             Resets every Tuesday 23:59 • {getTimeUntilReset()}
           </div>
         )}
