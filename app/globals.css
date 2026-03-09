@@ -13,7 +13,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #6da395af;
+    --background: #317592af;
     --foreground: #ededed;
   }
 }
@@ -22,7 +22,10 @@
 /*for white bg #e1dddd*/
 /*from the yellowish figures #c8bea8*/
 
-/*Best until now: #6da395af*/
+/*Best until now: Baby Blue #6da395af
+Blue/purple #6d7ea3af
+More darker than previous one #4665a9af 
+#317592af*/
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
