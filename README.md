@@ -106,17 +106,6 @@ https://piasta-net-app.azurewebsites.net
 | `/api/GameEvents/add-participant` | POST | Join an event |
 | `/api/GameEvents/remove-participant` | POST | Leave an event |
 
-### Updating API Types
-
-The project uses OpenAPI for type-safe API integration:
-
-```bash
-# Fetch the latest API spec
-node update-openapi.js
-
-# Generate TypeScript types
-npx openapi-typescript openapi/swagger.json --output openapi/types.ts
-```
 
 ## 📁 Project Structure
 
