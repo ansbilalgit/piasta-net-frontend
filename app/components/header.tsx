@@ -55,7 +55,12 @@ export function Header() {
             Game Library
           </a>
         </nav>
-        <div className="header-right">
+        <div className="header-right header-right-flex">
+          {isLoggedIn && (
+            <span className="header-username-text">
+              You are logged in as {typeof window !== 'undefined' ? localStorage.getItem('username') : ''}
+            </span>
+          )}
           {isLoggedIn ? (
             <button onClick={handleLogout} className="login-btn">
               <span>👤</span>
