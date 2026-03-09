@@ -443,7 +443,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-image: url("./Background/GeminiBackground4.png");
+  background-image: url("./Background/GeminiBackground.png");
   background-repeat: no-repeat;
   background-position: center calc(100% + var(--figures-offset-y));
   background-size: min(100%, 3280px) auto;
