@@ -104,26 +104,32 @@ export default function LoginPage() {
 
       // Check status and handle response
       if (response.ok) {
-        const data = await response.json();
-
+        // Signup returns plain text, login returns JSON
+        const responseText = await response.text();
+        
         if (isLoginMode) {
-          // Login success - store token and redirect
-          if (data.token) {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("username", data.username);
-            // Dispatch storage event to trigger header update
-            window.dispatchEvent(new Event("storage"));
-            toast.success("Login successful!");
-            // Wait a moment so user can see the message, then dismiss and navigate
-            setTimeout(() => {
-              toast.dismiss();
-              router.push("/");
-            }, 1000);
-          } else {
+          // Login success - parse JSON and store token
+          try {
+            const data = JSON.parse(responseText);
+            if (data.token) {
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("username", data.username);
+              // Dispatch storage event to trigger header update
+              window.dispatchEvent(new Event("storage"));
+              toast.success("Login successful!");
+              // Wait a moment so user can see the message, then dismiss and navigate
+              setTimeout(() => {
+                toast.dismiss();
+                router.push("/");
+              }, 1000);
+            } else {
+              toast.error("Invalid response from server");
+            }
+          } catch {
             toast.error("Invalid response from server");
           }
         } else {
-          // Signup success
+          // Signup success (plain text response like "User created!")
           toast.success("Account created successfully! Please log in.");
           setMode("login");
           setPassword("");
