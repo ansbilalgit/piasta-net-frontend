@@ -706,7 +706,6 @@ export default function GameEvents({
       {/* Restored showList wrapper */}
       {showList && (
         <div className="game-events-panel">
-          <h4>Existing Game Events</h4>
           {gameEvents.length > 0 ? (
             <div className="game-events-grid">
               {gameEvents.map((event, idx) => {
