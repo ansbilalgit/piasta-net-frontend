@@ -466,6 +466,12 @@ export default function GameEvents({
     return max - current;
   };
 
+  const getTitleTextSizeClass = (title: string) => {
+    if (title.length > 42) return "text-sm";
+    if (title.length > 30) return "text-base";
+    return "text-lg";
+  };
+
   const handleDeleteEvent = async (event: GameEvent) => {
     if (!isLoggedIn || !currentUser) {
       toast.error("Please log in to delete events");
@@ -707,22 +713,28 @@ export default function GameEvents({
       {showList && (
         <div className="game-events-panel">
           {gameEvents.length > 0 ? (
-            <div className="game-events-grid">
+            <div className="game-events-grid items-stretch">
               {gameEvents.map((event, idx) => {
                 const game = games.find(g => g.id === event.gameId);
                 const gameName = game ? game.name : `Game #${event.gameId}`;
                 const eventData = event as GameEvent;
                 const isOwner = isEventOwner(eventData);
                 const hasSlots = availableSlots(eventData) > 0;
+                const titleTextSizeClass = getTitleTextSizeClass(gameName);
 
                 return (
-                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_8px_20px_-6px_rgba(34,211,238,0.2)]">
+                  <div key={idx} className="w-full h-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_8px_20px_-6px_rgba(34,211,238,0.2)]">
 
                     {/* Card Header */}
-                    <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
+                    <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10 min-h-[105px]">
+                      <div className="flex h-full items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <h3
+                            title={gameName}
+                            className={`${titleTextSizeClass} font-bold text-white tracking-tight leading-tight whitespace-nowrap overflow-hidden text-ellipsis`}
+                          >
+                            {gameName}
+                          </h3>
 
                           {hasSlots && (
                             <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded text-xs font-medium">
@@ -739,7 +751,7 @@ export default function GameEvents({
                     </div>
 
                     {/* Card Body */}
-                    <div className="p-5 space-y-3">
+                    <div className="p-5 space-y-3 flex-1">
                       <div className="flex items-center gap-3 text-sm">
                         <span className="w-5 h-5 flex items-center justify-center text-cyan-400">🕐</span>
                         <span className="text-slate-400 font-medium">Start</span>
@@ -780,7 +792,7 @@ export default function GameEvents({
                     </div>
 
                     {/* Card Footer */}
-                    <div className="px-5 pb-5 flex flex-wrap gap-2">
+                    <div className="px-5 pb-5 mt-auto flex flex-wrap gap-2">
                       <button
                         className={`flex-1 bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-500/25 hover:text-cyan-300 hover:border-cyan-500/50'}`}
                         disabled={isProcessing}
