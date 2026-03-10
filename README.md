@@ -4,6 +4,7 @@
 [![React](https://img.shields.io/badge/React-19.2.3-61DAFB?style=flat&logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4.0-06B6D4?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
+[![Playwright](https://img.shields.io/badge/Playwright-Testing-2EAD33?style=flat&logo=playwright)](https://playwright.dev/)
 
 A modern, full-stack web application for managing game nights and events. Users can create and join game events, track participants, and manage their gaming community.
 
@@ -83,6 +84,36 @@ npm run build
 npm run start
 ```
 
+## 🧪 Testing
+
+This project uses [Playwright](https://playwright.dev/) for end-to-end (E2E) testing.
+
+### Run Tests
+
+```bash
+# Run all E2E tests
+npm run test:e2e
+
+# Run tests with interactive UI
+npm run test:e2e:ui
+
+# Run tests in debug mode
+npm run test:e2e:debug
+
+# View test report
+npm run test:e2e:report
+```
+
+### Test Coverage
+
+- **Homepage** - Hero section, navigation, content
+- **Authentication** - Login/signup forms, validation, GDPR modal
+- **Games Library** - Filters, search, sorting, responsive design
+- **Navigation** - Page routing, links
+- **Accessibility** - ARIA roles, keyboard navigation, focus management
+
+📖 **For detailed testing documentation**, see [`e2e/README.md`](./e2e/README.md)
+
 ## 🔌 API Integration
 
 This frontend connects to the **Piasta Net API**:
@@ -121,6 +152,12 @@ piasta-net-frontend-2/
 │   ├── login/                   # Authentication pages
 │   ├── games/                   # Game library pages
 │   └── page.tsx                 # Home page
+├── e2e/                         # Playwright E2E tests
+│   ├── homepage.spec.ts         # Homepage tests
+│   ├── login.spec.ts            # Authentication tests
+│   ├── games.spec.ts            # Game library tests
+│   ├── accessibility.spec.ts    # Accessibility tests
+│   └── README.md                # Testing documentation
 ├── lib/                         # Utility functions & services
 │   ├── participantsService.ts   # Participant API service
 │   ├── gameEventsService.ts     # Game event API service
