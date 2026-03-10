@@ -12,7 +12,6 @@ export interface WeeklyParticipantsResponse {
 }
 
 const API_BASE_URL = "https://piasta-net-app.azurewebsites.net/api/GameEvents";
-const CURRENT_USER = "John Doe"; // Replace with actual auth user
 
 
 /**
@@ -53,7 +52,13 @@ export async function fetchWeeklyParticipants(): Promise<WeeklyParticipantsRespo
         // The API returns an array of strings ["John Doe"], so we map it 
         // to objects so we don't have to rewrite your UI component
         const participantsList: string[] = upcomingEvent.participants || [];
-        const mappedParticipants = participantsList.map(p => ({
+        
+        // Filter out pre-existing test participants
+        const filteredParticipants = participantsList.filter(
+          p => p !== "John Doe" && p !== "sd"
+        );
+        
+        const mappedParticipants = filteredParticipants.map(p => ({
           userId: p,
           userName: p
         }));
@@ -61,7 +66,7 @@ export async function fetchWeeklyParticipants(): Promise<WeeklyParticipantsRespo
         return {
           eventId: upcomingEvent.id,
           participants: mappedParticipants,
-          totalCount: participantsList.length,
+          totalCount: filteredParticipants.length,
         };
       }
     }
@@ -75,11 +80,11 @@ export async function fetchWeeklyParticipants(): Promise<WeeklyParticipantsRespo
 /**
  * Join event using the real add-participant endpoint
  */
-export async function joinWeeklyEvent(eventId: string, userId: string = CURRENT_USER): Promise<void> {
+export async function joinWeeklyEvent(eventId: string, userId: string): Promise<void> {
   const payload = {
     gameEventID: eventId,
     participantUserID: userId,
-    requestingUserID: CURRENT_USER
+    requestingUserID: userId
   };
 
   const response = await fetch(`${API_BASE_URL}/add-participant`, {
@@ -97,11 +102,11 @@ export async function joinWeeklyEvent(eventId: string, userId: string = CURRENT_
 /**
  * Leave event using the real remove-participant endpoint
  */
-export async function leaveWeeklyEvent(eventId: string, userId: string = CURRENT_USER): Promise<void> {
+export async function leaveWeeklyEvent(eventId: string, userId: string): Promise<void> {
   const payload = {
     gameEventID: eventId,
     participantUserID: userId,
-    requestingUserID: CURRENT_USER
+    requestingUserID: userId
   };
 
   const response = await fetch(`${API_BASE_URL}/remove-participant`, {
@@ -119,6 +124,6 @@ export async function leaveWeeklyEvent(eventId: string, userId: string = CURRENT
 /**
  * Check if user has joined
  */
-export function hasUserJoined(participants: WeeklyParticipant[], userId: string = CURRENT_USER): boolean {
+export function hasUserJoined(participants: WeeklyParticipant[], userId: string): boolean {
   return participants.some(p => p.userId === userId);
 }

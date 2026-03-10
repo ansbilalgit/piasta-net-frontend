@@ -2,8 +2,9 @@
 import type { Item } from "../../lib/types";
 import type { components } from "../../openapi/types";
 import { toast, Toaster } from "react-hot-toast";
-import { Plus } from 'lucide-react'; // Restored from main
-import { useState, useEffect } from "react"; // Added useEffect back
+import { Plus, UserPlus, LogIn } from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 interface GameEventsProps {
   gameEvents: components["schemas"]["CreateGameEventDto"][];
@@ -19,6 +20,20 @@ type GameEvent = Omit<components["schemas"]["CreateGameEventDto"], "id"> & {
   participants?: string[];
 };
 
+// Helper functions to prevent Javascript Timezone shifting bugs
+const getLocalYMD = (d: Date = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const getLocalHM = (d: Date = new Date()) => {
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
+
 export default function GameEvents({
   gameEvents,
   games,
@@ -27,12 +42,14 @@ export default function GameEvents({
   showCreateButton = true,
   showList = true,
 }: GameEventsProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<GameEvent | null>(null);
   const [participantsOpen, setParticipantsOpen] = useState(false);
   const [viewingEvent, setViewingEvent] = useState<GameEvent | null>(null);
-  const [currentUser] = useState("John Doe");
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [participantName, setParticipantName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -56,44 +73,84 @@ export default function GameEvents({
     maxPlayers: "",
   });
 
+  // Check login status and listen for auth changes
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      const username = localStorage.getItem("username");
+      setIsLoggedIn(!!token);
+      setCurrentUser(username);
+    };
+
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    window.addEventListener("authChange", checkAuth);
+    window.addEventListener("focus", checkAuth);
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+      window.removeEventListener("authChange", checkAuth);
+      window.removeEventListener("focus", checkAuth);
+    };
+  }, []);
+
+  // Overlap protection logic
+  const hasOverlap = useCallback((targetGameId: number, startStr: string, endStr: string, eventIdToIgnore?: string) => {
+    const newStart = new Date(startStr).getTime();
+    const newEnd = new Date(endStr).getTime();
+
+    return gameEvents.some(event => {
+      if (eventIdToIgnore && String(event.id) === String(eventIdToIgnore)) return false;
+      if (event.gameId !== targetGameId) return false;
+      if (!event.startTime || !event.endTime) return false;
+
+      const existingStart = new Date(event.startTime).getTime();
+      const existingEnd = new Date(event.endTime).getTime();
+
+      return newStart < existingEnd && newEnd > existingStart;
+    });
+  }, [gameEvents]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     let updatedForm = { ...form, [name]: value };
+
     if (!updatedForm.endDate && updatedForm.startDate) {
       updatedForm.endDate = updatedForm.startDate;
     }
+
     if ((name === "game" || name === "startTime") && updatedForm.game && updatedForm.startTime) {
       const item = games.find(g => g.name === updatedForm.game);
       if (item) {
         const duration = typeof item.length === "number" ? item.length : 60;
         const [h, m] = updatedForm.startTime.split(":");
-        let startDate = new Date(updatedForm.startDate || new Date());
+        let startDate = new Date(updatedForm.startDate || getLocalYMD());
         startDate.setHours(parseInt(h, 10));
         startDate.setMinutes(parseInt(m, 10));
         startDate.setSeconds(0);
+
         let endDate = new Date(startDate.getTime() + duration * 60000);
-        updatedForm.endDate = updatedForm.startDate || new Date().toISOString().split("T")[0];
-        updatedForm.endTime = endDate
-          .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
-          .padStart(5, "0");
+        updatedForm.endDate = updatedForm.startDate || getLocalYMD();
+        updatedForm.endTime = getLocalHM(endDate);
       }
     }
+
     if ((name === "game" || name === "endTime") && updatedForm.game && updatedForm.endTime) {
       const item = games.find(g => g.name === updatedForm.game);
       if (item) {
         const duration = typeof item.length === "number" ? item.length : 60;
         const [h, m] = updatedForm.endTime.split(":");
-        let endDate = new Date(updatedForm.endDate || new Date());
+        let endDate = new Date(updatedForm.endDate || getLocalYMD());
         endDate.setHours(parseInt(h, 10));
         endDate.setMinutes(parseInt(m, 10));
         endDate.setSeconds(0);
+
         let startDate = new Date(endDate.getTime() - duration * 60000);
-        updatedForm.startDate = updatedForm.endDate || new Date().toISOString().split("T")[0];
-        updatedForm.startTime = startDate
-          .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
-          .padStart(5, "0");
+        updatedForm.startDate = updatedForm.endDate || getLocalYMD();
+        updatedForm.startTime = getLocalHM(startDate);
       }
     }
+
     if (name === "game" && value) {
       const item = games.find(g => g.name === value);
       if (item) {
@@ -115,19 +172,32 @@ export default function GameEvents({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to create events");
+      return;
+    }
+
     const game = games.find(g => g.name === form.game);
     if (!game) {
       toast.error("Game not found");
       return;
     }
 
-    setIsProcessing(true);
     const startDateTime = `${form.startDate}T${form.startTime}`;
     const endDateTime = `${form.endDate || form.startDate}T${form.endTime}`;
+
+    if (hasOverlap(game.id, startDateTime, endDateTime)) {
+      toast.error(`"${game.name}" is already scheduled during this time.`);
+      return;
+    }
+
+    setIsProcessing(true);
+
     const payload = {
       gameId: game.id,
-      startTime: new Date(startDateTime).toISOString(),
-      endTime: new Date(endDateTime).toISOString(),
+      startTime: `${startDateTime}:00`,
+      endTime: `${endDateTime}:00`,
       minNumberOfPlayers: Number(form.minPlayers),
       maxNumberOfPlayers: Number(form.maxPlayers),
       ownerUserId: currentUser,
@@ -141,7 +211,31 @@ export default function GameEvents({
       });
       if (!response.ok) throw new Error("Failed to create game event");
       const newEvent = await response.json();
-      setGameEvents(prev => [newEvent, ...prev]);
+      
+      // Add the creator as the first participant
+      const eventWithCreator = {
+        ...newEvent,
+        participants: [currentUser]
+      };
+      
+      // Also add the creator as a participant via the API
+      if (newEvent.id) {
+        try {
+          await fetch("https://piasta-net-app.azurewebsites.net/api/GameEvents/add-participant", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              gameEventID: newEvent.id,
+              participantUserID: currentUser,
+              requestingUserID: currentUser
+            }),
+          });
+        } catch (joinErr) {
+          console.error("[GameEvents] Failed to auto-join event:", joinErr);
+        }
+      }
+      
+      setGameEvents(prev => [eventWithCreator, ...prev]);
       setOpen(false);
       setForm({ game: "", startDate: "", startTime: "", endDate: "", endTime: "", minPlayers: "", maxPlayers: "" });
       toast.success("Game event created successfully!");
@@ -155,17 +249,37 @@ export default function GameEvents({
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingEvent?.id) return;
+    
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to edit events");
+      return;
+    }
 
-    setIsProcessing(true);
+    // Only allow editing own events
+    if (editingEvent.ownerUserId !== currentUser) {
+      toast.error("You can only edit your own events");
+      return;
+    }
+
     const game = games.find(g => g.name === editForm.game);
+    const targetGameId = game?.id || editingEvent.gameId;
+    if (targetGameId === undefined) return;
+
     const startDateTime = `${editForm.startDate}T${editForm.startTime}`;
     const endDateTime = `${editForm.endDate || editForm.startDate}T${editForm.endTime}`;
 
+    if (hasOverlap(targetGameId, startDateTime, endDateTime, editingEvent.id)) {
+      toast.error(`This game is already scheduled during this time.`);
+      return;
+    }
+
+    setIsProcessing(true);
+
     const payload = {
       gameEventId: editingEvent.id,
-      gameId: game?.id || editingEvent.gameId,
-      startTime: new Date(startDateTime).toISOString(),
-      endTime: new Date(endDateTime).toISOString(),
+      gameId: targetGameId,
+      startTime: `${startDateTime}:00`,
+      endTime: `${endDateTime}:00`,
       minNumberOfPlayers: Number(editForm.minPlayers),
       maxNumberOfPlayers: Number(editForm.maxPlayers),
       ownerUserId: editingEvent.ownerUserId,
@@ -201,18 +315,21 @@ export default function GameEvents({
   };
 
   const openEditDialog = (event: GameEvent) => {
+    // Only allow opening edit dialog for own events
+    if (!isLoggedIn || !currentUser || event.ownerUserId !== currentUser) {
+      toast.error("You can only edit your own events");
+      return;
+    }
+    
     setEditingEvent(event);
     const game = games.find(g => g.id === event.gameId);
 
-    const startDate = event.startTime ? new Date(event.startTime) : null;
-    const endDate = event.endTime ? new Date(event.endTime) : null;
-
     setEditForm({
       game: game?.name || "",
-      startDate: startDate ? startDate.toISOString().split("T")[0] : "",
-      startTime: startDate ? startDate.toTimeString().slice(0, 5) : "",
-      endDate: endDate ? endDate.toISOString().split("T")[0] : "",
-      endTime: endDate ? endDate.toTimeString().slice(0, 5) : "",
+      startDate: event.startTime ? event.startTime.substring(0, 10) : "",
+      startTime: event.startTime ? event.startTime.substring(11, 16) : "",
+      endDate: event.endTime ? event.endTime.substring(0, 10) : "",
+      endTime: event.endTime ? event.endTime.substring(11, 16) : "",
       minPlayers: String(event.minNumberOfPlayers || ""),
       maxPlayers: String(event.maxNumberOfPlayers || ""),
     });
@@ -229,7 +346,6 @@ export default function GameEvents({
     setEditingEvent(null);
   };
 
-  // Restored Escape Key listener from main branch
   useEffect(() => {
     if (!open && !editOpen && !participantsOpen) return;
 
@@ -246,6 +362,11 @@ export default function GameEvents({
   }, [open, editOpen, participantsOpen]);
 
   const addParticipant = async (eventId: string, userId: string) => {
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to join events");
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       const payload = {
@@ -287,6 +408,11 @@ export default function GameEvents({
   };
 
   const removeParticipant = async (eventId: string, userId: string) => {
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to leave events");
+      return;
+    }
+    
     setIsProcessing(true);
     try {
       const payload = {
@@ -332,12 +458,35 @@ export default function GameEvents({
     setParticipantsOpen(true);
   };
 
-  const isEventOwner = (event: GameEvent) => event.ownerUserId === currentUser;
-  const isParticipant = (event: GameEvent) => event.participants?.includes(currentUser);
+  const isEventOwner = (event: GameEvent) => isLoggedIn && currentUser !== null && event.ownerUserId === currentUser;
+  const isParticipant = (event: GameEvent) => isLoggedIn && currentUser !== null && event.participants?.includes(currentUser);
   const availableSlots = (event: GameEvent) => {
     const max = event.maxNumberOfPlayers || 0;
     const current = event.participants?.length || 0;
     return max - current;
+  };
+
+  const handleDeleteEvent = async (event: GameEvent) => {
+    if (!isLoggedIn || !currentUser) {
+      toast.error("Please log in to delete events");
+      return;
+    }
+
+    // Only allow deleting own events
+    if (event.ownerUserId !== currentUser) {
+      toast.error("You can only delete your own events");
+      return;
+    }
+
+    setIsProcessing(true);
+    const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
+    if (ok) {
+      setGameEvents(prev => prev.filter(ev => ev.id !== event.id));
+      toast.success('Event deleted successfully');
+    } else {
+      toast.error('Failed to delete event');
+    }
+    setIsProcessing(false);
   };
 
   const getTitleSizeClass = (title: string) => {
@@ -351,12 +500,18 @@ export default function GameEvents({
     <>
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#1e293b', color: '#fff' } }} />
 
-      {/* Restored showCreateButton wrapper */}
       {showCreateButton && (
-        <button type="button" className="btn-cta game-events-create-btn" onClick={() => setOpen(true)} style={{ marginBottom: '1rem' }}>
-          <Plus className="h-5 w-5 game-events-create-icon" />
-          <span>Create Game Event</span>
-        </button>
+        isLoggedIn ? (
+          <button type="button" className="btn-cta game-events-create-btn" onClick={() => setOpen(true)} style={{ marginBottom: '1rem' }}>
+            <Plus className="h-5 w-5 game-events-create-icon" />
+            <span>Create Game Event</span>
+          </button>
+        ) : (
+          <button type="button" className="btn-cta game-events-create-btn" onClick={() => router.push("/login")} style={{ marginBottom: '1rem' }}>
+            <LogIn className="h-5 w-5 game-events-create-icon" />
+            <span>Login to Create Event</span>
+          </button>
+        )
       )}
 
       {/* Create Dialog */}
@@ -378,11 +533,11 @@ export default function GameEvents({
               </label>
               <label>
                 Start Date:
-                <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required min={new Date().toISOString().split("T")[0]} />
+                <input type="date" name="startDate" value={form.startDate} onChange={handleChange} required min={getLocalYMD()} />
               </label>
               <label>
                 End Date:
-                <input type="date" name="endDate" value={form.endDate} onChange={handleChange} min={form.startDate || new Date().toISOString().split("T")[0]} required />
+                <input type="date" name="endDate" value={form.endDate} onChange={handleChange} min={form.startDate || getLocalYMD()} required />
               </label>
               <label>
                 Start Time:
@@ -492,20 +647,28 @@ export default function GameEvents({
               </div>
 
               <div className="flex gap-3">
-                {!isParticipant(viewingEvent) && availableSlots(viewingEvent) > 0 && (
+                {!isParticipant(viewingEvent) && availableSlots(viewingEvent) > 0 && isLoggedIn && (
                   <button
                     className={`flex-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-lg px-4 py-2 font-semibold transition-colors ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-500/30'}`}
                     disabled={isProcessing}
-                    onClick={() => viewingEvent.id && addParticipant(viewingEvent.id, currentUser)}
+                    onClick={() => viewingEvent.id && currentUser && addParticipant(viewingEvent.id, currentUser)}
                   >
                     {isProcessing ? '⏳ Processing...' : '✋ Join Event'}
+                  </button>
+                )}
+                {!isLoggedIn && availableSlots(viewingEvent) > 0 && (
+                  <button
+                    className={`flex-1 bg-slate-500/20 text-slate-400 border border-slate-500/40 rounded-lg px-4 py-2 font-semibold transition-colors hover:bg-slate-500/30`}
+                    onClick={() => router.push("/login")}
+                  >
+                    Login to Join
                   </button>
                 )}
                 {isParticipant(viewingEvent) && !isEventOwner(viewingEvent) && (
                   <button
                     className={`flex-1 bg-orange-500/20 text-orange-400 border border-orange-500/40 rounded-lg px-4 py-2 font-semibold transition-colors ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-500/30'}`}
                     disabled={isProcessing}
-                    onClick={() => viewingEvent.id && removeParticipant(viewingEvent.id, currentUser)}
+                    onClick={() => viewingEvent.id && currentUser && removeParticipant(viewingEvent.id, currentUser)}
                   >
                     {isProcessing ? '⏳ Processing...' : '🚪 Leave Event'}
                   </button>
@@ -560,16 +723,24 @@ export default function GameEvents({
                 const hasSlots = availableSlots(eventData) > 0;
 
                 return (
-                  <div key={idx} className="w-full h-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden flex flex-col">
+                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/50 hover:shadow-[0_8px_20px_-6px_rgba(34,211,238,0.2)]">
 
                     {/* Card Header */}
-                    <div className="px-5 py-3 h-16 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
-                      <div className="flex h-full items-center justify-between gap-3">
-                        <h3 className={`${getTitleSizeClass(gameName)} min-w-0 flex-1 whitespace-normal break-words font-bold text-white tracking-tight leading-tight`}>
-                          {gameName}
-                        </h3>
+                    <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
+
+                          {hasSlots && (
+                            <div className="mt-2 inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-1 rounded text-xs font-medium">
+                              <UserPlus size={14} className="animate-heartbeat text-amber-400" />
+                              Looking for Players
+                            </div>
+                          )}
+
+                        </div>
                         {isOwner && (
-                          <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">Host</span>
+                          <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full shrink-0">Host</span>
                         )}
                       </div>
                     </div>
@@ -630,10 +801,8 @@ export default function GameEvents({
                           className={`bg-orange-500/15 text-orange-400 border border-orange-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-orange-500/25 hover:text-orange-300 hover:border-orange-500/50'}`}
                           disabled={isProcessing}
                           onClick={async () => {
-                            if (!eventData.id) return;
-                            if (confirm('Are you sure you want to leave this event?')) {
-                              await removeParticipant(eventData.id, currentUser);
-                            }
+                            if (!eventData.id || !currentUser) return;
+                            await removeParticipant(eventData.id, currentUser);
                           }}
                         >
                           <span>🚪</span> Leave
@@ -650,23 +819,15 @@ export default function GameEvents({
                         </button>
                       )}
 
-                      <button
-                        className={`bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500/25 hover:text-red-300 hover:border-red-500/50'}`}
-                        disabled={isProcessing}
-                        onClick={async () => {
-                          setIsProcessing(true);
-                          const ok = await deleteGameEvent(event.id ?? '', event.ownerUserId ?? undefined);
-                          if (ok) {
-                            setGameEvents(prev => prev.filter(ev => ev.id !== event.id));
-                            toast.success('Event deleted successfully');
-                          } else {
-                            toast.error('Failed to delete event');
-                          }
-                          setIsProcessing(false);
-                        }}
-                      >
-                        <span>🗑️</span>
-                      </button>
+                      {isOwner && (
+                        <button
+                          className={`bg-red-500/15 text-red-400 border border-red-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500/25 hover:text-red-300 hover:border-red-500/50'}`}
+                          disabled={isProcessing}
+                          onClick={() => handleDeleteEvent(eventData)}
+                        >
+                          <span>🗑️</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

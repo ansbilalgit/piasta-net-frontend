@@ -37,7 +37,7 @@ export async function createGameEvent(payload: GameEventPayload): Promise<any> {
 }
 
 export async function fetchGameEvents(): Promise<components["schemas"]["CreateGameEventDto"][]> {
-  const url = "https://piasta-net-app.azurewebsites.net/api/GameEvents?upcomingOnly=true&pastOnly=false";
+  const url = "https://piasta-net-app.azurewebsites.net/api/GameEvents?upcomingOnly=true&pastOnly=false&sortBy=starttime&sortDir=asc";
   console.log("[GameEventsService] GET:", url);
     const response = await fetch(url);
     if (!response.ok) {

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Clock, Heart, X } from "lucide-react"; // <-- Added 'X' icon for the close button
+import { Users, Clock, Heart, X } from "lucide-react";
 
 interface GameCardProps {
     title: string;
@@ -13,6 +13,15 @@ interface GameCardProps {
     thumbnail?: string;
     interested?: boolean;
     onInterestToggle?: () => void;
+}
+
+/**
+ * Decode HTML entities in a string (e.g., "&#10;" -> "\n", "&amp;" -> "&")
+ */
+function decodeHtmlEntities(text: string): string {
+    const textArea = document.createElement("textarea");
+    textArea.innerHTML = text;
+    return textArea.value;
 }
 
 export function GameCard({
@@ -28,12 +37,15 @@ export function GameCard({
     // 1. State to control the pop-up window
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Decode HTML entities for display
+    const decodedDescription = decodeHtmlEntities(description);
+
     // 2. Logic to shorten the text just for the card view
     const MAX_LENGTH = 150;
-    const isLongDescription = description.length > MAX_LENGTH;
+    const isLongDescription = decodedDescription.length > MAX_LENGTH;
     const displayDescription = isLongDescription
-        ? description.substring(0, MAX_LENGTH) + "..."
-        : description;
+        ? decodedDescription.substring(0, MAX_LENGTH) + "..."
+        : decodedDescription;
 
     return (
         <>
@@ -104,12 +116,12 @@ export function GameCard({
                 <div
                     // This darkens the background and puts the modal on top (z-50)
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                    onClick={() => setIsModalOpen(false)} // Clicking the dark background closes it
+                    onClick={() => setIsModalOpen(false)}
                 >
                     <div
                         // The actual window box
                         className="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto flex flex-col relative shadow-2xl"
-                        onClick={(e) => e.stopPropagation()} // Prevents clicks inside the window from closing it
+                        onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close Button (X icon) */}
                         <button
@@ -125,7 +137,7 @@ export function GameCard({
                             we added in page.tsx are rendered as actual paragraphs! 
                         */}
                         <div className="text-slate-300 text-base leading-relaxed whitespace-pre-wrap">
-                            {description}
+                            {decodedDescription}
                         </div>
                     </div>
                 </div>
