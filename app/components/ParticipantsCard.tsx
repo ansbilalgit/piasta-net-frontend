@@ -132,7 +132,7 @@ export function ParticipantCounter() {
           {isLoading ? (
             <Loader2 className="h-12 w-12 animate-spin text-blue-400" role="status" aria-label="Loading" />
           ) : (
-            <span className="text-6xl md:text-7xl font-display font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-counter-pulse">
+            <span className="text-6xl md:text-7xl font-display font-bold bg-linear-to-r from-blue-500 via-purple-400 to-purple-400 bg-clip-text text-transparent animate-counter-pulse">
               {count}
             </span>
           )}
