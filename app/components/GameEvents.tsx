@@ -340,6 +340,13 @@ export default function GameEvents({
     return max - current;
   };
 
+  const getTitleSizeClass = (title: string) => {
+    if (title.length > 58) return "text-xs";
+    if (title.length > 40) return "text-sm";
+    if (title.length > 28) return "text-base";
+    return "text-lg";
+  };
+
   return (
     <>
       <Toaster position="bottom-right" toastOptions={{ style: { background: '#1e293b', color: '#fff' } }} />
@@ -553,12 +560,14 @@ export default function GameEvents({
                 const hasSlots = availableSlots(eventData) > 0;
 
                 return (
-                  <div key={idx} className="w-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden">
+                  <div key={idx} className="w-full h-full rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-cyan-500/20 overflow-hidden flex flex-col">
 
                     {/* Card Header */}
-                    <div className="px-5 py-4 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-bold text-white tracking-tight">{gameName}</h3>
+                    <div className="px-5 py-3 h-16 bg-gradient-to-r from-cyan-500/15 to-purple-500/15 border-b border-cyan-500/10">
+                      <div className="flex h-full items-center justify-between gap-3">
+                        <h3 className={`${getTitleSizeClass(gameName)} min-w-0 flex-1 whitespace-normal break-words font-bold text-white tracking-tight leading-tight`}>
+                          {gameName}
+                        </h3>
                         {isOwner && (
                           <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">Host</span>
                         )}
@@ -566,7 +575,7 @@ export default function GameEvents({
                     </div>
 
                     {/* Card Body */}
-                    <div className="p-5 space-y-3">
+                    <div className="p-5 space-y-3 flex-1">
                       <div className="flex items-center gap-3 text-sm">
                         <span className="w-5 h-5 flex items-center justify-center text-cyan-400">🕐</span>
                         <span className="text-slate-400 font-medium">Start</span>
@@ -607,7 +616,7 @@ export default function GameEvents({
                     </div>
 
                     {/* Card Footer */}
-                    <div className="px-5 pb-5 flex flex-wrap gap-2">
+                    <div className="px-5 pb-5 mt-auto flex flex-wrap gap-2">
                       <button
                         className={`flex-1 bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-1 ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-cyan-500/25 hover:text-cyan-300 hover:border-cyan-500/50'}`}
                         disabled={isProcessing}
